@@ -41,6 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 This web application will allow programmers to join groups to develop collaborative projects. Users can create groups, request to join existing groups, share comments, and manage joint development projects.
 
 ---
+
 ## Main Functionalities
 
 ### Authentication and User Management
