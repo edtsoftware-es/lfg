@@ -68,7 +68,7 @@ export const users = pgTable(
   },
   (table) => [
     uniqueIndex("idx_users_username").on(table.username),
-    check("username_length_check", sql`${table.username} >= 3`)
+    check("username_length_check", sql`LENGTH(${table.username}) > 2`)
   ]
 );
 
@@ -160,7 +160,7 @@ export const groups = pgTable(
   (table) => [
     index("idx_groups_owner").on(table.ownerId),
     index("idx_groups_state").on(table.state),
-    check("name_min_length", sql`${table.name} >= 6`)
+    check("name_min_length", sql`LENGTH(${table.name}) > 5`)
   ]
 );
 
