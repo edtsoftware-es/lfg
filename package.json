@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "ultracite lint",
-    "format": "ultracite format"
+    "format": "ultracite format",
+    "generate": "npx drizzle-kit generate",
+    "migrate": "npx drizzle-kit migrate",
+    "push": "npx drizzle-kit push"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0",
