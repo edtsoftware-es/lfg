@@ -119,6 +119,9 @@ export const userProfile = pgTable('user_profile', {
     .references(() => users.id, { onDelete: 'cascade' }),
   bio: varchar('bio', { length: 160 }),
   icon: varchar('icon', { length: 255 }),
+  role: integer('role')
+    .notNull()
+    .references(() => roles.id),
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
