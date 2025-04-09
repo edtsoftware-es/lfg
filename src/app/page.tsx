@@ -16,7 +16,7 @@ export default async function Home() {
         </form>
       ) : (
         <>
-          <RegisterForm roles={[]} />
+          <RegisterForm roles={roles} />
           <h1>Sign in</h1>
           <LoginForm />
         </>

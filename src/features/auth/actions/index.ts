@@ -55,10 +55,11 @@ export async function signOut() {
 const registerSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
+  role: z.string().min(1),
 });
 
 export const registerAction = validatedAction(registerSchema, async (data) => {
-  const { username, password } = data;
+  const { username, password, role } = data;
 
   const existingUser = await db
     .select()
@@ -81,6 +82,7 @@ export const registerAction = validatedAction(registerSchema, async (data) => {
     const [createdUser] = await tx.insert(users).values(newUser).returning();
     await tx.insert(userProfile).values({
       userId: createdUser.id,
+      role: +role,
     });
 
     return createdUser;
