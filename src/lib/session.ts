@@ -50,7 +50,7 @@ const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 export async function setSession(user: User) {
   const expiresInOneDay = new Date(Date.now() + MILLISECONDS_PER_DAY);
   const session: SessionData = {
-    user: { id: user.id! },
+    user: { id: user.id },
     expires: expiresInOneDay.toISOString(),
   };
   const encryptedSession = await signToken(session);
