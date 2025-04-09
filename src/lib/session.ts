@@ -1,5 +1,5 @@
 import type { User } from '@/db/schema';
-import { compare } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 

@@ -2,8 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Role } from '@/db/schema';
 import { registerAction } from '@/features/auth/actions';
 import type { ActionState } from '@/lib/middleware';
@@ -38,14 +36,14 @@ export function RegisterForm({ roles }: { roles: Role[] }) {
         maxLength={100}
         placeholder="Password"
       />
-      <RadioGroup name="role" className="flex">
+      {/* <RadioGroup name="role" className="flex">
         {roles?.map((role) => (
           <div key={role.id} className="flex items-center space-x-2">
             <RadioGroupItem value={role.name} />
             <Label htmlFor="option-one">{role.name}</Label>
           </div>
         ))}
-      </RadioGroup>
+      </RadioGroup> */}
       <Button type="submit" disabled={signInPending}>
         Register
       </Button>

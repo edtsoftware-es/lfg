@@ -1,13 +1,12 @@
 'use server';
 
 import { db } from '@/db/drizzle';
-import { users } from '@/db/schema';
+import { type NewUser, userProfile, users } from '@/db/schema';
 import { validatedAction } from '@/lib/middleware';
-import { comparePasswords, setSession } from '@/lib/session';
+import { comparePasswords, hashPassword, setSession } from '@/lib/session';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
-import { register } from '../api/register';
 
 const loginSchema = z.object({
   username: z.string().min(1),
@@ -56,9 +55,40 @@ export async function signOut() {
 const registerSchema = z.object({
   username: z.string().min(1),
   password: z.string().min(1),
-  role: z.string(),
 });
 
 export const registerAction = validatedAction(registerSchema, async (data) => {
-  await register(data);
+  const { username, password } = data;
+
+  const existingUser = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
+
+  if (existingUser.length > 0) {
+    return { error: 'Username already taken. Please try again.' };
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  const newUser: NewUser = {
+    username,
+    password: passwordHash,
+  };
+
+  const createdUserResult = await db.transaction(async (tx) => {
+    const [createdUser] = await tx.insert(users).values(newUser).returning();
+    await tx.insert(userProfile).values({
+      userId: createdUser.id,
+    });
+
+    return createdUser;
+  });
+
+  if (!createdUserResult) {
+    return { error: 'Failed to create user. Please try again.' };
+  }
+
+  await setSession(createdUserResult);
 });
