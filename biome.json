@@ -3,5 +3,20 @@
   "extends": ["ultracite"],
   "files": {
     "ignore": ["components/ui/**", "lib/middleware.ts"]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "style": {
+        "noNonNullAssertion": "info"
+      }
+    }
   }
 }
