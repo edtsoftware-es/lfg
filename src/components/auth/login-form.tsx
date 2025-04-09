@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { signInAction } from '@/features/auth/actions';
+import { signInAction } from '@/lib/actions/auth';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
 

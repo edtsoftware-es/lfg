@@ -1,7 +1,7 @@
+import { LoginForm } from '@/components/auth/login-form';
+import { RegisterForm } from '@/components/auth/register-form';
 import { Button } from '@/components/ui/button';
-import { signOut } from '@/features/auth/actions';
-import { LoginForm } from '@/features/auth/ui/login-form';
-import { RegisterForm } from '@/features/auth/ui/register-form';
+import { signOut } from '@/lib/actions/auth';
 import { getRoles, getUser } from '@/lib/queries';
 
 export default async function Home() {

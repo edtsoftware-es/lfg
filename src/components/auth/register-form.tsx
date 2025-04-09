@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { Role } from '@/db/schema';
-import { registerAction } from '@/features/auth/actions';
+import { registerAction } from '@/lib/actions/auth';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
 
