@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { signOut } from './actions';
-import { LoginForm } from './auth.client';
+import { signOut } from '@/features/auth/actions';
+import { LoginForm } from '@/features/auth/ui/login-form';
 
 export default function Home() {
   return (

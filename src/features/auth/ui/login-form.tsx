@@ -1,9 +1,9 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { signInAction } from '@/features/auth/actions';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
-import { signInAction } from './actions';
 
 export function LoginForm() {
   const [signInState, signInFormAction, signInPending] = useActionState<

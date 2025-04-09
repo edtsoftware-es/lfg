@@ -10,8 +10,8 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-export const signInAction = validatedAction(loginSchema, async (data) => {
-  const { username, password } = data;
+export const signInAction = validatedAction(loginSchema, async (_data) => {
+  //const { username, password } = data;
 
   // rate limit
 
