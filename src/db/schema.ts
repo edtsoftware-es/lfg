@@ -1,74 +1,74 @@
 import {
-  pgTable,
-  integer,
-  varchar,
-  boolean,
-  timestamp,
-  text,
-  pgEnum,
-  uniqueIndex,
-  index,
-  serial,
-  check,
-} from "drizzle-orm/pg-core";
-import {
-  relations, sql,
-  type InferSelectModel,
   type InferInsertModel,
-} from "drizzle-orm";
+  type InferSelectModel,
+  relations,
+  sql,
+} from 'drizzle-orm';
+import {
+  boolean,
+  check,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 // Enumerations - kept as is, enums are efficient in PostgreSQL
-export const languageEnum = pgEnum("language_enum", [
-  "SPANISH",
-  "ENGLISH",
-  "FRENCH",
-  "DEUTSCHE",
-  "CHINESE",
+export const languageEnum = pgEnum('language_enum', [
+  'SPANISH',
+  'ENGLISH',
+  'FRENCH',
+  'DEUTSCHE',
+  'CHINESE',
 ]);
-export const targetEnum = pgEnum("target_enum", [
-  "STARTUP",
-  "JOB",
-  "LEARNING",
-  "OTHERS",
+export const targetEnum = pgEnum('target_enum', [
+  'STARTUP',
+  'JOB',
+  'LEARNING',
+  'OTHERS',
 ]);
-export const scheduleEnum = pgEnum("schedule_enum", [
-  "MORNINGS",
-  "AFTERNOON",
-  "WEEKENDS",
-  "NIGHTS",
+export const scheduleEnum = pgEnum('schedule_enum', [
+  'MORNINGS',
+  'AFTERNOON',
+  'WEEKENDS',
+  'NIGHTS',
 ]);
-export const applyStatesEnum = pgEnum("apply_states_enum", [
-  "PENDING",
-  "ACCEPTED",
-  "REJECTED",
+export const applyStatesEnum = pgEnum('apply_states_enum', [
+  'PENDING',
+  'ACCEPTED',
+  'REJECTED',
 ]);
-export const groupStatesEnum = pgEnum("group_states_enum", [
-  "OPEN",
-  "ONGOING",
-  "CLOSED",
-  "REBUILD",
-  "DONE",
+export const groupStatesEnum = pgEnum('group_states_enum', [
+  'OPEN',
+  'ONGOING',
+  'CLOSED',
+  'REBUILD',
+  'DONE',
 ]);
 
 // Tabla users - Using integer instead of bigint for most use cases
 export const users = pgTable(
-  "users",
+  'users',
   {
-    id: serial("id").primaryKey().notNull(),
-    username: varchar("username", { length: 30 })
-      .notNull(),
-    password: varchar("password", { length: 255 }).notNull(),
-    disabled: boolean("disabled").default(false).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    id: serial('id').primaryKey().notNull(),
+    username: varchar('username', { length: 30 }).notNull(),
+    password: varchar('password', { length: 255 }).notNull(),
+    disabled: boolean('disabled').default(false).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
-    uniqueIndex("idx_users_username").on(table.username),
-    check("username_length_check", sql`LENGTH(${table.username}) > 2`)
+    uniqueIndex('idx_users_username').on(table.username),
+    check('username_length_check', sql`LENGTH(${table.username}) > 2`),
   ]
 );
 
@@ -89,14 +89,14 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 }));
 
 // Tabla roles - simplified
-export const roles = pgTable("roles", {
-  id: serial("id").primaryKey().notNull(),
-  name: varchar("name", { length: 50 }).notNull().unique(),
-  img: varchar("img", { length: 255 }),
-  createdAt: timestamp("created_at", { withTimezone: true })
+export const roles = pgTable('roles', {
+  id: serial('id').primaryKey().notNull(),
+  name: varchar('name', { length: 50 }).notNull().unique(),
+  img: varchar('img', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
 });
@@ -112,17 +112,20 @@ export const rolesRelations = relations(roles, ({ many }) => ({
 }));
 
 // Tabla user_profile - simplified
-export const userProfile = pgTable("user_profile", {
-  userId: integer("user_id")
+export const userProfile = pgTable('user_profile', {
+  userId: integer('user_id')
     .primaryKey()
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  bio: varchar("bio", { length: 160 }),
-  icon: varchar("icon", { length: 255 }),
-  createdAt: timestamp("created_at", { withTimezone: true })
+    .references(() => users.id, { onDelete: 'cascade' }),
+  bio: varchar('bio', { length: 160 }),
+  icon: varchar('icon', { length: 255 }),
+  role: integer('role')
+    .notNull()
+    .references(() => roles.id),
+  createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .notNull(),
 });
@@ -141,26 +144,26 @@ export const userProfileRelations = relations(userProfile, ({ one }) => ({
 
 // Tabla groups - optimized
 export const groups = pgTable(
-  "groups",
+  'groups',
   {
-    id: serial("id").primaryKey().notNull(),
-    ownerId: integer("owner_id")
+    id: serial('id').primaryKey().notNull(),
+    ownerId: integer('owner_id')
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    name: varchar("name", { length: 255 }).notNull(),
-    description: text("description").notNull(),
-    state: groupStatesEnum("state").notNull().default("OPEN"),
-    createdAt: timestamp("created_at", { withTimezone: true })
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    description: text('description').notNull(),
+    state: groupStatesEnum('state').notNull().default('OPEN'),
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
-    index("idx_groups_owner").on(table.ownerId),
-    index("idx_groups_state").on(table.state),
-    check("name_min_length", sql`LENGTH(${table.name}) > 5`)
+    index('idx_groups_owner').on(table.ownerId),
+    index('idx_groups_state').on(table.state),
+    check('name_min_length', sql`LENGTH(${table.name}) > 5`),
   ]
 );
 
@@ -183,27 +186,27 @@ export const groupsRelations = relations(groups, ({ one, many }) => ({
 
 // Tabla groups_filter - optimized with composite index
 export const groupsFilter = pgTable(
-  "groups_filter",
+  'groups_filter',
   {
-    id: serial("id").primaryKey().notNull(),
-    groupId: integer("group_id")
+    id: serial('id').primaryKey().notNull(),
+    groupId: integer('group_id')
       .notNull()
-      .references(() => groups.id, { onDelete: "cascade" }),
-    type: varchar("type", { length: 20 }).notNull(),
-    value: varchar("value", { length: 50 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    type: varchar('type', { length: 20 }).notNull(),
+    value: varchar('value', { length: 50 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     // Combined index for more efficient filtering
-    index("idx_groups_filter_composite").on(
+    index('idx_groups_filter_composite').on(
       table.groupId,
       table.type,
-      table.value,
+      table.value
     ),
   ]
 );
@@ -222,28 +225,25 @@ export const groupsFilterRelations = relations(groupsFilter, ({ one }) => ({
 
 // Tabla group_roles - optimized
 export const groupRoles = pgTable(
-  "group_roles",
+  'group_roles',
   {
-    id: serial("id").primaryKey().notNull(),
-    groupId: integer("group_id")
+    id: serial('id').primaryKey().notNull(),
+    groupId: integer('group_id')
       .notNull()
-      .references(() => groups.id, { onDelete: "cascade" }),
-    role: integer("role")
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    role: integer('role')
       .notNull()
       .references(() => roles.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     // Single composite index instead of two separate indexes
-    uniqueIndex("idx_group_roles_composite").on(
-      table.groupId,
-      table.role,
-    ),
+    uniqueIndex('idx_group_roles_composite').on(table.groupId, table.role),
   ]
 );
 
@@ -265,35 +265,32 @@ export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
 
 // Tabla applies - optimized
 export const applies = pgTable(
-  "applies",
+  'applies',
   {
-    id: serial("id").primaryKey().notNull(),
-    userId: integer("user_id")
+    id: serial('id').primaryKey().notNull(),
+    userId: integer('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    groupId: integer("group_id")
+      .references(() => users.id, { onDelete: 'cascade' }),
+    groupId: integer('group_id')
       .notNull()
-      .references(() => groups.id, { onDelete: "cascade" }),
-    state: applyStatesEnum("state").notNull().default("PENDING"),
-    createdAt: timestamp("created_at", { withTimezone: true })
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    state: applyStatesEnum('state').notNull().default('PENDING'),
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     // Combined index for state filtering with user/group context
-    index("idx_applies_state_user_group").on(
+    index('idx_applies_state_user_group').on(
       table.state,
       table.userId,
-      table.groupId,
+      table.groupId
     ),
     // Unique constraint to prevent duplicate applications
-    uniqueIndex("idx_unique_user_group_apply").on(
-      table.userId,
-      table.groupId,
-    ),
+    uniqueIndex('idx_unique_user_group_apply').on(table.userId, table.groupId),
   ]
 );
 
@@ -315,29 +312,29 @@ export const appliesRelations = relations(applies, ({ one }) => ({
 
 // Tabla group_comments - optimized
 export const groupComments = pgTable(
-  "group_comments",
+  'group_comments',
   {
-    id: serial("id").primaryKey().notNull(),
-    userId: integer("user_id")
+    id: serial('id').primaryKey().notNull(),
+    userId: integer('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    groupId: integer("group_id")
+      .references(() => users.id, { onDelete: 'cascade' }),
+    groupId: integer('group_id')
       .notNull()
-      .references(() => groups.id, { onDelete: "cascade" }),
-    description: text("description").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    description: text('description').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     // Combined index since comments are typically queried by group
-    index("idx_group_comments_group_user").on(
+    index('idx_group_comments_group_user').on(
       table.groupId,
       table.userId,
-      table.createdAt,
+      table.createdAt
     ),
   ]
 );
@@ -360,38 +357,32 @@ export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
 
 // Tabla users_to_group - optimized
 export const usersToGroup = pgTable(
-  "users_to_group",
+  'users_to_group',
   {
-    id: serial("id").primaryKey().notNull(),
-    userId: integer("user_id")
+    id: serial('id').primaryKey().notNull(),
+    userId: integer('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    groupId: integer("group_id")
+      .references(() => users.id, { onDelete: 'cascade' }),
+    groupId: integer('group_id')
       .notNull()
-      .references(() => groups.id, { onDelete: "cascade" }),
-    role: integer("role")
+      .references(() => groups.id, { onDelete: 'cascade' }),
+    role: integer('role')
       .notNull()
       .references(() => roles.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp('updated_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     // Combined index for role-based group membership queries
-    index("idx_users_to_group_group_role").on(
-      table.groupId,
-      table.role,
-    ),
+    index('idx_users_to_group_group_role').on(table.groupId, table.role),
     // Index for user's group membership queries
-    index("idx_users_to_group_user").on(table.userId),
+    index('idx_users_to_group_user').on(table.userId),
     // Unique constraint
-    uniqueIndex("idx_unique_user_group").on(
-      table.userId,
-      table.groupId,
-    ),
+    uniqueIndex('idx_unique_user_group').on(table.userId, table.groupId),
   ]
 );
 

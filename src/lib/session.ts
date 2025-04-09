@@ -1,3 +1,4 @@
+import type { User } from '@/db/schema';
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
@@ -46,9 +47,7 @@ export async function getSession() {
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export async function setSession(user: {
-  id: number;
-}) {
+export async function setSession(user: User) {
   const expiresInOneDay = new Date(Date.now() + MILLISECONDS_PER_DAY);
   const session: SessionData = {
     user: { id: user.id },

@@ -1,9 +1,10 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { signInAction } from '@/lib/actions/auth';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
-import { signInAction } from './actions';
 
 export function LoginForm() {
   const [signInState, signInFormAction, signInPending] = useActionState<
@@ -12,7 +13,10 @@ export function LoginForm() {
   >(signInAction, { error: '' });
 
   return (
-    <form action={signInFormAction}>
+    <form
+      action={signInFormAction}
+      className="flex flex-col items-center justify-center gap-4"
+    >
       <Input
         id="username"
         name="username"
@@ -31,9 +35,9 @@ export function LoginForm() {
         maxLength={100}
         placeholder="Password"
       />
-      <button type="submit" disabled={signInPending}>
+      <Button type="submit" disabled={signInPending}>
         Login
-      </button>
+      </Button>
       {signInState?.error && <div>{signInState.error}</div>}
     </form>
   );
