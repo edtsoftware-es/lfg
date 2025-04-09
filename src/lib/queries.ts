@@ -1,7 +1,7 @@
 import { unstable_cache } from './unstable-cache';
 
 import { db } from '@/db/drizzle';
-import { roles, users } from '@/db/schema';
+import { groups, roles, users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { verifyToken } from './session';
@@ -36,6 +36,16 @@ export const getRoles = unstable_cache(
     return db.select().from(roles);
   },
   ['roles'],
+  {
+    revalidate: 60 * 60 * 2,
+  }
+);
+
+export const getGroups = unstable_cache(
+  () => {
+    return db.select().from(groups);
+  },
+  ['groups'],
   {
     revalidate: 60 * 60 * 2,
   }
