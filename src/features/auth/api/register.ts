@@ -1,23 +1,22 @@
-import { db, pool } from '@/db/drizzle';
+import { db } from '@/db/drizzle';
 import { type NewUser, userProfile, users } from '@/db/schema';
 
 export async function register(user: NewUser) {
-  const client = await pool.connect();
-
   try {
-    const createdUser = await db.insert(users).values(user).returning();
-    await db.insert(userProfile).values({
-      userId: createdUser[0].id,
+    await db.transaction(async (tx) => {
+      const createdUser = await tx.insert(users).values(user).returning();
+      console.log({ createdUser });
+      await tx.insert(userProfile).values({
+        userId: createdUser[0].id,
+      });
     });
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       error: `SignUp error: ${error}`,
     };
-  } finally {
-    client.release();
   }
-
-  await pool.end();
-
-  return { success: true, error: null };
+  return {
+    success: true,
+    error: null,
+  };
 }
