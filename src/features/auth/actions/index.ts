@@ -1,7 +1,10 @@
 'use server';
 
+import { db } from '@/db/drizzle';
+import { users } from '@/db/schema';
 import { validatedAction } from '@/lib/middleware';
-import { setSession } from '@/lib/session';
+import { comparePasswords, setSession } from '@/lib/session';
+import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { register } from '../api/register';
@@ -11,33 +14,36 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-export const signInAction = validatedAction(loginSchema, async (_data) => {
-  //const { username, password } = data;
+export const signInAction = validatedAction(loginSchema, async (data) => {
+  const { username, password } = data;
 
   // rate limit
 
-  // buscar si hay user
-  // const user= await ....
-  const user = { id: 1, name: 'Juan', password: 'hashed' };
+  const user = await db
+    .select({
+      user: users,
+    })
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
 
-  // if (user.length === 0) {
-  //   return {
-  //     error: 'Invalid username or password.',
-  //   };
-  // }
-  //
+  if (user.length === 0) {
+    return {
+      error: 'Invalid username or password.',
+    };
+  }
 
-  // const { user: foundUser } = user[0];
+  const { user: foundUser } = user[0];
 
-  // const isPasswordValid = await comparePasswords(password, user.password);
+  const isPasswordValid = await comparePasswords(password, foundUser.password);
 
-  // if (!isPasswordValid) {
-  //   return {
-  //     error: 'Invalid username or password.',
-  //   };
-  // }
+  if (!isPasswordValid) {
+    return {
+      error: 'Invalid username or password.',
+    };
+  }
 
-  await setSession(user);
+  await setSession(foundUser);
 });
 
 export async function signOut() {
