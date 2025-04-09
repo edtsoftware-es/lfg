@@ -4,6 +4,7 @@ import { validatedAction } from '@/lib/middleware';
 import { setSession } from '@/lib/session';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { register } from '../api/register';
 
 const loginSchema = z.object({
   username: z.string().min(1),
@@ -45,3 +46,13 @@ export async function signOut() {
     cookieStore.delete(cookie.name);
   }
 }
+
+const registerSchema = z.object({
+  username: z.string().min(1),
+  password: z.string().min(1),
+  role: z.string(),
+});
+
+export const registerAction = validatedAction(registerSchema, async (data) => {
+  await register(data);
+});

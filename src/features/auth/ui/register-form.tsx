@@ -2,19 +2,22 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { signInAction } from '@/features/auth/actions';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import type { Role } from '@/db/schema';
+import { registerAction } from '@/features/auth/actions';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
 
-export function LoginForm() {
-  const [signInState, signInFormAction, signInPending] = useActionState<
+export function RegisterForm({ roles }: { roles: Role[] }) {
+  const [signInState, registerFormAction, signInPending] = useActionState<
     ActionState,
     FormData
-  >(signInAction, { error: '' });
+  >(registerAction, { error: '', payload: {} });
 
   return (
     <form
-      action={signInFormAction}
+      action={registerFormAction}
       className="flex flex-col items-center justify-center gap-4"
     >
       <Input
@@ -24,7 +27,7 @@ export function LoginForm() {
         type="text"
         required
         maxLength={30}
-        placeholder="Username"
+        placeholder="Your Nickname"
       />
       <Input
         id="password"
@@ -35,8 +38,16 @@ export function LoginForm() {
         maxLength={100}
         placeholder="Password"
       />
+      <RadioGroup name="role" className="flex">
+        {roles?.map((role) => (
+          <div key={role.id} className="flex items-center space-x-2">
+            <RadioGroupItem value={role.name} />
+            <Label htmlFor="option-one">{role.name}</Label>
+          </div>
+        ))}
+      </RadioGroup>
       <Button type="submit" disabled={signInPending}>
-        Login
+        Register
       </Button>
       {signInState?.error && <div>{signInState.error}</div>}
     </form>
