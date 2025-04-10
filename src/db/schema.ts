@@ -36,6 +36,7 @@ export const scheduleEnum = pgEnum('schedule_enum', [
   'AFTERNOON',
   'WEEKENDS',
   'NIGHTS',
+  'ANY',
 ]);
 export const applyStatesEnum = pgEnum('apply_states_enum', [
   'PENDING',
@@ -142,6 +143,9 @@ export const groups = pgTable(
     name: varchar('name', { length: 255 }).notNull(),
     description: text('description').notNull(),
     state: groupStatesEnum('state').notNull().default('OPEN'),
+    target: targetEnum('target').notNull(),
+    schedule: scheduleEnum('schedule').notNull().default('ANY'),
+    language: languageEnum('language').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
