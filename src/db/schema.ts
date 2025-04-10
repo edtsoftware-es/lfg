@@ -18,7 +18,6 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-// Enumerations - kept as is, enums are efficient in PostgreSQL
 export const languageEnum = pgEnum('language_enum', [
   'SPANISH',
   'ENGLISH',
@@ -51,7 +50,6 @@ export const groupStatesEnum = pgEnum('group_states_enum', [
   'DONE',
 ]);
 
-// Tabla users - Using integer instead of bigint for most use cases
 export const users = pgTable(
   'users',
   {
@@ -72,11 +70,9 @@ export const users = pgTable(
   ]
 );
 
-// Tipos para users
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
 
-// Relaciones de users
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfile, {
     fields: [users.id],
@@ -88,7 +84,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   userGroups: many(usersToGroup),
 }));
 
-// Tabla roles - simplified
 export const roles = pgTable('roles', {
   id: serial('id').primaryKey().notNull(),
   name: varchar('name', { length: 50 }).notNull().unique(),
@@ -101,17 +96,14 @@ export const roles = pgTable('roles', {
     .notNull(),
 });
 
-// Tipos para roles
 export type Role = InferSelectModel<typeof roles>;
 export type NewRole = InferInsertModel<typeof roles>;
 
-// Relaciones de roles
 export const rolesRelations = relations(roles, ({ many }) => ({
   groupRoles: many(groupRoles),
   userGroups: many(usersToGroup),
 }));
 
-// Tabla user_profile - simplified
 export const userProfile = pgTable('user_profile', {
   userId: integer('user_id')
     .primaryKey()
@@ -130,11 +122,9 @@ export const userProfile = pgTable('user_profile', {
     .notNull(),
 });
 
-// Tipos para user_profile
 export type UserProfile = InferSelectModel<typeof userProfile>;
 export type NewUserProfile = InferInsertModel<typeof userProfile>;
 
-// Relaciones de user_profile
 export const userProfileRelations = relations(userProfile, ({ one }) => ({
   user: one(users, {
     fields: [userProfile.userId],
@@ -142,7 +132,6 @@ export const userProfileRelations = relations(userProfile, ({ one }) => ({
   }),
 }));
 
-// Tabla groups - optimized
 export const groups = pgTable(
   'groups',
   {
@@ -167,11 +156,9 @@ export const groups = pgTable(
   ]
 );
 
-// Tipos para groups
 export type Group = InferSelectModel<typeof groups>;
 export type NewGroup = InferInsertModel<typeof groups>;
 
-// Relaciones de groups
 export const groupsRelations = relations(groups, ({ one, many }) => ({
   owner: one(users, {
     fields: [groups.ownerId],
@@ -184,7 +171,6 @@ export const groupsRelations = relations(groups, ({ one, many }) => ({
   members: many(usersToGroup),
 }));
 
-// Tabla groups_filter - optimized with composite index
 export const groupsFilter = pgTable(
   'groups_filter',
   {
@@ -202,7 +188,6 @@ export const groupsFilter = pgTable(
       .notNull(),
   },
   (table) => [
-    // Combined index for more efficient filtering
     index('idx_groups_filter_composite').on(
       table.groupId,
       table.type,
@@ -211,11 +196,9 @@ export const groupsFilter = pgTable(
   ]
 );
 
-// Tipos para groups_filter
 export type GroupFilter = InferSelectModel<typeof groupsFilter>;
 export type NewGroupFilter = InferInsertModel<typeof groupsFilter>;
 
-// Relaciones de groups_filter
 export const groupsFilterRelations = relations(groupsFilter, ({ one }) => ({
   group: one(groups, {
     fields: [groupsFilter.groupId],
@@ -223,7 +206,6 @@ export const groupsFilterRelations = relations(groupsFilter, ({ one }) => ({
   }),
 }));
 
-// Tabla group_roles - optimized
 export const groupRoles = pgTable(
   'group_roles',
   {
@@ -231,6 +213,9 @@ export const groupRoles = pgTable(
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
+    userId: integer('user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
     role: integer('role')
       .notNull()
       .references(() => roles.id),
@@ -242,16 +227,16 @@ export const groupRoles = pgTable(
       .notNull(),
   },
   (table) => [
-    // Single composite index instead of two separate indexes
-    uniqueIndex('idx_group_roles_composite').on(table.groupId, table.role),
+    uniqueIndex('idx_group_roles_user_composite').on(
+      table.groupId,
+      table.userId
+    ),
   ]
 );
 
-// Tipos para group_roles
 export type GroupRole = InferSelectModel<typeof groupRoles>;
 export type NewGroupRole = InferInsertModel<typeof groupRoles>;
 
-// Relaciones de group_roles
 export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
   group: one(groups, {
     fields: [groupRoles.groupId],
@@ -263,7 +248,6 @@ export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
   }),
 }));
 
-// Tabla applies - optimized
 export const applies = pgTable(
   'applies',
   {
@@ -283,22 +267,18 @@ export const applies = pgTable(
       .notNull(),
   },
   (table) => [
-    // Combined index for state filtering with user/group context
     index('idx_applies_state_user_group').on(
       table.state,
       table.userId,
       table.groupId
     ),
-    // Unique constraint to prevent duplicate applications
     uniqueIndex('idx_unique_user_group_apply').on(table.userId, table.groupId),
   ]
 );
 
-// Tipos para applies
 export type Apply = InferSelectModel<typeof applies>;
 export type NewApply = InferInsertModel<typeof applies>;
 
-// Relaciones de applies
 export const appliesRelations = relations(applies, ({ one }) => ({
   user: one(users, {
     fields: [applies.userId],
@@ -310,7 +290,6 @@ export const appliesRelations = relations(applies, ({ one }) => ({
   }),
 }));
 
-// Tabla group_comments - optimized
 export const groupComments = pgTable(
   'group_comments',
   {
@@ -330,7 +309,6 @@ export const groupComments = pgTable(
       .notNull(),
   },
   (table) => [
-    // Combined index since comments are typically queried by group
     index('idx_group_comments_group_user').on(
       table.groupId,
       table.userId,
@@ -339,11 +317,9 @@ export const groupComments = pgTable(
   ]
 );
 
-// Tipos para group_comments
 export type GroupComment = InferSelectModel<typeof groupComments>;
 export type NewGroupComment = InferInsertModel<typeof groupComments>;
 
-// Relaciones de group_comments
 export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
   user: one(users, {
     fields: [groupComments.userId],
@@ -355,7 +331,6 @@ export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
   }),
 }));
 
-// Tabla users_to_group - optimized
 export const usersToGroup = pgTable(
   'users_to_group',
   {
@@ -377,20 +352,14 @@ export const usersToGroup = pgTable(
       .notNull(),
   },
   (table) => [
-    // Combined index for role-based group membership queries
-    index('idx_users_to_group_group_role').on(table.groupId, table.role),
-    // Index for user's group membership queries
     index('idx_users_to_group_user').on(table.userId),
-    // Unique constraint
     uniqueIndex('idx_unique_user_group').on(table.userId, table.groupId),
   ]
 );
 
-// Tipos para users_to_group
 export type UserToGroup = InferSelectModel<typeof usersToGroup>;
 export type NewUserToGroup = InferInsertModel<typeof usersToGroup>;
 
-// Relaciones de users_to_group
 export const usersToGroupRelations = relations(usersToGroup, ({ one }) => ({
   user: one(users, {
     fields: [usersToGroup.userId],
@@ -406,14 +375,12 @@ export const usersToGroupRelations = relations(usersToGroup, ({ one }) => ({
   }),
 }));
 
-// Tipo para los valores de las enumeraciones
 export type LanguageType = (typeof languageEnum.enumValues)[number];
 export type TargetType = (typeof targetEnum.enumValues)[number];
 export type ScheduleType = (typeof scheduleEnum.enumValues)[number];
 export type ApplyStateType = (typeof applyStatesEnum.enumValues)[number];
 export type GroupStateType = (typeof groupStatesEnum.enumValues)[number];
 
-// Tipos con relaciones incluidas
 export interface UserWithRelations extends User {
   profile?: UserProfile;
   ownedGroups?: Group[];
@@ -447,7 +414,6 @@ export interface GroupCommentWithRelations extends GroupComment {
   group?: Group;
 }
 
-// Exportación de todas las tablas para operaciones en bloque
 export const schema = {
   users,
   userProfile,
