@@ -22,7 +22,7 @@ export default function GroupCardDemo() {
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col justify-center gap-8">
+    <div className="flex min-h-screen w-full flex-col justify-center gap-2">
       <GroupCard {...exampleGroup} />
 
       <GroupCard
@@ -55,6 +55,44 @@ export default function GroupCardDemo() {
           { role: 'BACKEND', filled: 1, total: 1 },
           { role: 'DESIGNER', filled: 0, total: 1 },
           { role: 'PM', filled: 0, total: 1 },
+        ]}
+        leader={{
+          name: 'Elena Martín',
+          avatar: '/placeholder.svg?height=32&width=32',
+        }}
+      />
+
+      <GroupCard
+        id="3"
+        name="Desarrollo App Móvil"
+        state="DONE"
+        language="French"
+        schedule="Mornings"
+        target="Job"
+        rolesNeeded={[
+          { role: 'MOBILE', filled: 1, total: 2 },
+          { role: 'BACKEND', filled: 1, total: 1 },
+          { role: 'DESIGNER', filled: 0, total: 1 },
+          { role: 'PM', filled: 0, total: 1 },
+        ]}
+        leader={{
+          name: 'Elena Martín',
+          avatar: '/placeholder.svg?height=32&width=32',
+        }}
+      />
+
+      <GroupCard
+        id="3"
+        name="Desarrollo App Móvil"
+        state="CLOSED"
+        language="French"
+        schedule="Mornings"
+        target="Job"
+        rolesNeeded={[
+          { role: 'MOBILE', filled: 2, total: 2 },
+          { role: 'BACKEND', filled: 1, total: 1 },
+          { role: 'DESIGNER', filled: 1, total: 1 },
+          { role: 'PM', filled: 1, total: 1 },
         ]}
         leader={{
           name: 'Elena Martín',

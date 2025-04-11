@@ -92,35 +92,12 @@ const roleConfig: Record<Role, { icon: React.ReactNode; color: string }> = {
   },
 };
 
-const stateConfig: Record<
-  GroupState,
-  { color: string; bgColor: string; bgGradientColor: string }
-> = {
-  OPEN: {
-    color: 'text-emerald-300',
-    bgColor: 'bg-gradient-to-r from-card to-emerald-600',
-    bgGradientColor: 'bg-gradient-to-r from-emerald-600 to-green-600',
-  },
-  ONGOING: {
-    color: 'text-blue-300',
-    bgColor: 'bg-gradient-to-r from-card to-blue-600',
-    bgGradientColor: 'bg-gradient-to-r from-blue-600 to-cyan-600',
-  },
-  CLOSED: {
-    color: 'text-red-300',
-    bgColor: 'bg-gradient-to-r from-card to-red-600',
-    bgGradientColor: 'bg-gradient-to-r from-red-600 to-rose-600',
-  },
-  REBUILD: {
-    color: 'text-amber-300',
-    bgColor: 'bg-gradient-to-r from-card to-amber-600',
-    bgGradientColor: 'bg-gradient-to-r from-amber-600 to-orange-600',
-  },
-  DONE: {
-    color: 'text-purple-300',
-    bgColor: 'bg-gradient-to-r from-card to-purple-600',
-    bgGradientColor: 'bg-gradient-to-r from-purple-600 to-fuchsia-600',
-  },
+const stateConfig: Record<GroupState, { color: string }> = {
+  OPEN: { color: 'text-emerald-300' },
+  ONGOING: { color: 'text-cyan-300' },
+  CLOSED: { color: 'text-rose-600' },
+  REBUILD: { color: 'text-amber-300' },
+  DONE: { color: 'text-fuchsia-600' },
 };
 
 export function GroupCard({
@@ -139,45 +116,43 @@ export function GroupCard({
     <Link href={`/groups/${id}`} passHref>
       <Card
         className={cn(
-          'relative w-full cursor-pointer overflow-hidden transition-all duration-300',
+          'relative w-full cursor-pointer overflow-hidden transition-all duration-200',
           'gap-4 rounded-md bg-card p-0',
-          'hover:bg-muted-foreground/10'
+          'hover:bg-muted-foreground/15'
         )}
       >
-        <div className="absolute top-0 right-0 flex w-full justify-end">
-          <div className={`h-1 w-3/4 ${stateStyle.bgColor}`} />
-          <Badge
-            className={`${stateStyle.bgGradientColor} rounded-none rounded-bl-md border-0 px-3 font-extrabold text-white`}
-          >
-            {state}
-          </Badge>
-        </div>
+        <Badge
+          variant="outline"
+          className={`${stateStyle.color} absolute top-0 right-0 border-0 py-1 font-black`}
+        >
+          {state}
+        </Badge>
 
-        <CardHeader className="gap-3 pt-6">
-          <h3 className="bg-clip-text pl-2 font-bold text-foreground text-lg">
+        <CardHeader className="gap-3 pt-5">
+          <h3 className="bg-clip-text pl-2 font-bold text-card-foreground text-lg">
             {name}
           </h3>
 
           <div className="flex flex-wrap gap-2">
             <Badge
               variant="outline"
-              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-foreground capitalize"
+              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground capitalize"
             >
-              <Globe className="h-3 w-3 text-foreground" />
+              <Globe className="h-3 w-3 text-card-foreground" />
               {language}
             </Badge>
             <Badge
               variant="outline"
-              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-foreground"
+              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
             >
-              <Clock className="h-3 w-3 text-foreground" />
+              <Clock className="h-3 w-3 text-card-foreground" />
               {schedule}
             </Badge>
             <Badge
               variant="outline"
-              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-foreground"
+              className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
             >
-              <Target className="h-3 w-3 text-foreground" />
+              <Target className="h-3 w-3 text-card-foreground" />
               {target}
             </Badge>
           </div>
@@ -206,12 +181,12 @@ export function GroupCard({
                     <span
                       className={cn(
                         'font-medium text-xs',
-                        isFilled ? 'text-foreground' : 'text-muted-foreground'
+                        isFilled ? 'text-primary' : 'text-muted-foreground'
                       )}
                     >
                       {role.filled}/{role.total}
                     </span>
-                    <span className="text-foreground text-xs capitalize">
+                    <span className="text-card-foreground text-xs capitalize">
                       {role.role.toLowerCase()}
                     </span>
                   </div>
@@ -221,7 +196,7 @@ export function GroupCard({
           </div>
         </CardContent>
 
-        <CardFooter className="mt-0 flex items-center justify-between border-card-800/50 border-t py-3 [.border-t]:pt-3">
+        <CardFooter className="mt-0 flex items-center justify-between border-card-800/50 border-t py-4 [.border-t]:pt-3">
           <div className="flex items-center gap-2.5">
             <Avatar className="h-8 w-8">
               <AvatarImage src={leader.avatar} alt={leader.name} />
@@ -233,7 +208,7 @@ export function GroupCard({
               <Button
                 variant="link"
                 size="sm"
-                className="cursor-pointer p-0 text-foreground text-sm"
+                className="cursor-pointer p-0 text-card-foreground text-sm"
               >
                 {leader.name}
               </Button>
@@ -243,7 +218,7 @@ export function GroupCard({
           <Button
             variant="link"
             size="sm"
-            className="cursor-pointer text-foreground text-sm transition-colors hover:text-white"
+            className="cursor-pointer gap-1 text-card-foreground text-sm"
           >
             See more <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
