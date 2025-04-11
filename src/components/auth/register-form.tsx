@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import type { Role } from '@/db/schema';
 import { registerAction } from '@/lib/actions/auth';
 import type { ActionState } from '@/lib/middleware';
 import { useActionState } from 'react';
 
-export function RegisterForm({ roles }: { roles: Role[] }) {
+export function RegisterForm({
+  roles,
+}: {
+  roles: {
+    id: number;
+    name: string;
+    img: string | null;
+  }[];
+}) {
   const [signInState, registerFormAction, signInPending] = useActionState<
     ActionState,
     FormData
