@@ -123,9 +123,9 @@ export const userProfile = pgTable(
     location: varchar('location', { length: 144 }),
     skills: text('skills').array(),
     linkdin: varchar('linkdin', { length: 240 }),
-    twitter: varchar('linkdin', { length: 240 }),
-    instagram: varchar('linkdin', { length: 240 }),
-    github: varchar('linkdin', { length: 240 }),
+    twitter: varchar('twitter', { length: 240 }),
+    instagram: varchar('instagram', { length: 240 }),
+    github: varchar('github', { length: 240 }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
