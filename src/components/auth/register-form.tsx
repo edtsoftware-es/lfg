@@ -6,16 +6,14 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { registerAction } from '@/lib/actions/auth';
 import type { ActionState } from '@/lib/middleware';
+import type { Role } from '@/lib/queries';
+
 import { useActionState } from 'react';
 
 export function RegisterForm({
   roles,
 }: {
-  roles: {
-    id: number;
-    name: string;
-    img: string | null;
-  }[];
+  roles: Role[];
 }) {
   const [signInState, registerFormAction, signInPending] = useActionState<
     ActionState,

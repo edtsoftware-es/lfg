@@ -75,6 +75,8 @@ export const getUserProfile = unstable_cache(
   }
 );
 
+export type UserProfile = Awaited<ReturnType<typeof getUserProfile>>;
+
 export const getRoles = unstable_cache(
   () => {
     return db
@@ -90,6 +92,8 @@ export const getRoles = unstable_cache(
     revalidate: 60 * 60 * 2,
   }
 );
+
+export type Role = Awaited<ReturnType<typeof getRoles>>;
 
 export const getGroups = unstable_cache(
   () => {
