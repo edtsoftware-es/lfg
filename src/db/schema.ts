@@ -105,23 +105,36 @@ export const rolesRelations = relations(roles, ({ many }) => ({
   userGroups: many(usersToGroup),
 }));
 
-export const userProfile = pgTable('user_profile', {
-  userId: integer('user_id')
-    .primaryKey()
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  bio: varchar('bio', { length: 160 }),
-  icon: varchar('icon', { length: 255 }).default('placeholder'),
-  role: integer('role')
-    .notNull()
-    .references(() => roles.id),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const userProfile = pgTable(
+  'user_profile',
+  {
+    userId: integer('user_id')
+      .primaryKey()
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    userName: varchar('user_name').references(() => users.username),
+    name: varchar('name', { length: 40 }),
+    bio: varchar('bio', { length: 160 }),
+    icon: varchar('icon', { length: 255 }).default('placeholder'),
+    role: integer('role')
+      .notNull()
+      .references(() => roles.id),
+    email: varchar('email', { length: 144 }),
+    location: varchar('location', { length: 144 }),
+    skills: text('skills').array(),
+    linkdin: varchar('linkdin', { length: 240 }),
+    twitter: varchar('linkdin', { length: 240 }),
+    instagram: varchar('linkdin', { length: 240 }),
+    github: varchar('linkdin', { length: 240 }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('idx_user_profile_name').on(table.userName)]
+);
 
 export type UserProfile = InferSelectModel<typeof userProfile>;
 export type NewUserProfile = InferInsertModel<typeof userProfile>;
