@@ -1,5 +1,3 @@
-'use client';
-
 import type React from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -92,12 +90,12 @@ const roleConfig: Record<Role, { icon: React.ReactNode; color: string }> = {
   },
 };
 
-const stateConfig: Record<GroupState, { color: string }> = {
-  OPEN: { color: 'text-emerald-300' },
-  ONGOING: { color: 'text-cyan-300' },
-  CLOSED: { color: 'text-rose-600' },
-  REBUILD: { color: 'text-amber-300' },
-  DONE: { color: 'text-fuchsia-600' },
+const stateConfig: Record<GroupState, { color: string; textColor: string }> = {
+  OPEN: { color: 'border-r-open', textColor: 'text-open' },
+  ONGOING: { color: 'border-r-on-going', textColor: 'text-on-going' },
+  CLOSED: { color: 'border-r-closed', textColor: 'text-closed' },
+  REBUILD: { color: 'border-r-rebuild', textColor: 'text-rebuild' },
+  DONE: { color: 'border-r-done', textColor: 'text-done' },
 };
 
 export function GroupCard({
@@ -116,17 +114,24 @@ export function GroupCard({
     <Link href={`/groups/${id}`} passHref>
       <Card
         className={cn(
-          'relative w-full cursor-pointer overflow-hidden transition-all duration-200',
+          'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
           'gap-4 rounded-md bg-card p-0',
-          'hover:bg-muted-foreground/15'
+          'hover:bg-muted-foreground/5 dark:hover:bg-muted-foreground/10'
         )}
       >
-        <Badge
-          variant="outline"
-          className={`${stateStyle.color} absolute top-0 right-0 border-0 py-1 font-black`}
-        >
-          {state}
-        </Badge>
+        <div className="group absolute top-0 right-0">
+          <div className="relative cursor-pointer">
+            <div
+              className={`${stateStyle.color} absolute top-0 right-0 h-0 w-0 border-r-[20px] border-b-[20px] border-b-transparent transition-opacity duration-300 group-hover:opacity-0 group-active:opacity-0`}
+            />
+            <Badge
+              variant="outline"
+              className={`${stateStyle.textColor} absolute top-0 right-0 translate-x-full transform border-0 py-1 font-black opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-active:translate-x-0 group-active:opacity-100`}
+            >
+              {state}
+            </Badge>
+          </div>
+        </div>
 
         <CardHeader className="gap-3 pt-5">
           <h3 className="bg-clip-text pl-2 font-bold text-card-foreground text-lg">
@@ -218,7 +223,7 @@ export function GroupCard({
           <Button
             variant="link"
             size="sm"
-            className="cursor-pointer gap-1 text-card-foreground text-sm"
+            className="cursor-pointer gap-1 px-0 text-card-foreground text-sm has-[>svg]:px-0"
           >
             See more <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
