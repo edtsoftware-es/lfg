@@ -1,0 +1,68 @@
+### OPTIMIZACIÓN
+
+## REGLAS PARA LAS LLAMADAS (GETs)
+
+- **Solo hacer select de los campos necesarios.**
+- **No modificar orden de los parámetros de búsqueda.**
+
+
+## Obtener datos de usuario (userProfile)
+
+```sql
+SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github
+FROM user_profile
+WHERE id = [user_id];
+```
+
+## Obtener todos los roles
+
+```sql
+SELECT id, name, img
+FROM roles;
+```
+
+## Obtener todos los grupos (cacheada + staletime)
+
+Obtener todos los grupos (groups) + group_roles por ID del grupo. Necesario para mostrar toda la información de las cards. Realizar filtrado + ordenación de roles, cupos disponibles, etc desde el front.
+
+## Obtener los datos del grupo
+
+Obtener grupo por ID + group_roles (en group_roles se ha utilizado como relación el nombre del usuario para no hacer join por id de la tabla users).
+Misma operación de ordenación desde el front.
+
+## Obtener comentarios del grupo
+
+Obtener comentarios del grupo (group_comments) por ID de grupo.
+
+## Obtener applies del grupo:
+
+```sql
+SELECT userName, role, message, createdAt
+FROM applies
+WHERE groupId = [groupID del grupo];
+```
+
+Si por diseño, los cupos/usuarios/roles, comentarios y applies quedan ocultos en la vista inicial, separar las llamadas (en total 4), si no, agrupar de la mejor forma.
+
+## Obtener applies de un usuario
+
+```sql
+SELECT ap.role, ap.createdAt, ap.state, ap.group.id, gp.name
+FROM applies ap
+JOIN groups gp ON ap.groupId = gp.id
+WHERE ap.userId = [id];
+```
+
+Los valores de enums como horarios, estados, objetivos, que se necesitan para filtrar, creación de grupos etc., se obtienen de los tipos exportados en schema.ts:
+
+```typescript
+export type LanguageType;
+export type TargetType;
+export type ScheduleType;
+export type ApplyStateType;
+export type GroupStateType;
+```
+
+## MUTACIONES (PUTs, POSTs)
+
+Se ha reducido el número de índices para mejorar la velocidad de escritura. Se usará useOptimistic desde el front para simular una escritura instantánea, por lo que no tenemos la necesidad de agregar índices compuestos ni vistas materializadas.
