@@ -1,15 +1,15 @@
-import type React from 'react';
+import type React from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Briefcase,
   ChevronRight,
@@ -23,21 +23,21 @@ import {
   Smartphone,
   Target,
   Users,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
-type Language = 'Spanish' | 'English' | 'French' | 'Deutsche' | 'Chinese';
-type StudyTarget = 'Startup' | 'Job' | 'Learning' | 'Others';
-type Schedule = 'Mornings' | 'Afternoon' | 'Weekends' | 'Nights' | 'Any';
-type GroupState = 'OPEN' | 'ONGOING' | 'CLOSED' | 'REBUILD' | 'DONE';
+type Language = "Spanish" | "English" | "French" | "Deutsche" | "Chinese";
+type StudyTarget = "Startup" | "Job" | "Learning" | "Others";
+type Schedule = "Mornings" | "Afternoon" | "Weekends" | "Nights" | "Any";
+type GroupState = "OPEN" | "ONGOING" | "CLOSED" | "REBUILD" | "DONE";
 type Role =
-  | 'FRONTEND'
-  | 'BACKEND'
-  | 'PM'
-  | 'DESIGNER'
-  | 'DEVOPS'
-  | 'FULLSTACK'
-  | 'MOBILE';
+  | "FRONTEND"
+  | "BACKEND"
+  | "PM"
+  | "DESIGNER"
+  | "DEVOPS"
+  | "FULLSTACK"
+  | "MOBILE";
 
 type RoleNeeded = {
   role: Role;
@@ -62,40 +62,40 @@ type GroupCardProps = {
 const roleConfig: Record<Role, { icon: React.ReactNode; color: string }> = {
   FRONTEND: {
     icon: <Layout className="h-4 w-4" />,
-    color: 'from-pink-500 to-purple-500',
+    color: "from-pink-500 to-purple-500",
   },
   BACKEND: {
     icon: <Cpu className="h-4 w-4" />,
-    color: 'from-blue-500 to-cyan-500',
+    color: "from-blue-500 to-cyan-500",
   },
   PM: {
     icon: <Briefcase className="h-4 w-4" />,
-    color: 'from-amber-500 to-orange-500',
+    color: "from-amber-500 to-orange-500",
   },
   DESIGNER: {
     icon: <Palette className="h-4 w-4" />,
-    color: 'from-rose-500 to-pink-500',
+    color: "from-rose-500 to-pink-500",
   },
   DEVOPS: {
     icon: <Code className="h-4 w-4" />,
-    color: 'from-indigo-500 to-blue-500',
+    color: "from-indigo-500 to-blue-500",
   },
   FULLSTACK: {
     icon: <Users className="h-4 w-4" />,
-    color: 'from-emerald-500 to-teal-500',
+    color: "from-emerald-500 to-teal-500",
   },
   MOBILE: {
     icon: <Smartphone className="h-4 w-4" />,
-    color: 'from-lime-500 to-emerald-500',
+    color: "from-lime-500 to-emerald-500",
   },
 };
 
 const stateConfig: Record<GroupState, { color: string; textColor: string }> = {
-  OPEN: { color: 'border-r-open', textColor: 'text-open' },
-  ONGOING: { color: 'border-r-on-going', textColor: 'text-on-going' },
-  CLOSED: { color: 'border-r-closed', textColor: 'text-closed' },
-  REBUILD: { color: 'border-r-rebuild', textColor: 'text-rebuild' },
-  DONE: { color: 'border-r-done', textColor: 'text-done' },
+  OPEN: { color: "bg-primary", textColor: "text-primary" },
+  ONGOING: { color: "bg-on-going", textColor: "text-on-going" },
+  CLOSED: { color: "bg-closed", textColor: "text-closed" },
+  REBUILD: { color: "bg-rebuild", textColor: "text-rebuild" },
+  DONE: { color: "bg-done", textColor: "text-done" },
 };
 
 export function GroupCard({
@@ -114,15 +114,15 @@ export function GroupCard({
     <Link href={`/groups/${id}`} passHref>
       <Card
         className={cn(
-          'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
-          'gap-4 rounded-md bg-card p-0',
-          'hover:bg-muted-foreground/5 dark:hover:bg-muted-foreground/10'
+          "group relative w-full cursor-pointer overflow-hidden transition-all duration-200",
+          "gap-4 rounded-none border-0 bg-background p-0",
+          "hover:bg-muted-foreground/5 dark:hover:bg-foreground/[2%]"
         )}
       >
         <div className="group absolute top-0 right-0">
-          <div className="relative cursor-pointer">
+          <div className="relative">
             <div
-              className={`${stateStyle.color} absolute top-0 right-0 h-0 w-0 border-r-[20px] border-b-[20px] border-b-transparent transition-opacity duration-300 group-hover:opacity-0 group-active:opacity-0`}
+              className={`${stateStyle.color} absolute top-0 right-0 h-5 w-1 transition-opacity duration-300 group-hover:opacity-0 group-active:opacity-0`}
             />
             <Badge
               variant="outline"
@@ -173,8 +173,8 @@ export function GroupCard({
                 <div
                   key={index}
                   className={cn(
-                    'flex items-center gap-2 rounded-lg px-2 py-1 transition-all',
-                    'border border-card-800'
+                    "flex items-center gap-2 rounded-lg px-2 py-1 transition-all",
+                    "border border-card-800"
                   )}
                 >
                   <div
@@ -185,8 +185,8 @@ export function GroupCard({
                   <div className="flex flex-col">
                     <span
                       className={cn(
-                        'font-medium text-xs',
-                        isFilled ? 'text-primary' : 'text-muted-foreground'
+                        "font-medium text-xs",
+                        isFilled ? "text-primary" : "text-muted-foreground"
                       )}
                     >
                       {role.filled}/{role.total}
@@ -201,7 +201,7 @@ export function GroupCard({
           </div>
         </CardContent>
 
-        <CardFooter className="mt-0 flex items-center justify-between border-card-800/50 border-t py-4 [.border-t]:pt-3">
+        <CardFooter className="mt-0 flex items-center justify-between pt-1 pb-4">
           <div className="flex items-center gap-2.5">
             <Avatar className="h-8 w-8">
               <AvatarImage src={leader.avatar} alt={leader.name} />
@@ -213,7 +213,7 @@ export function GroupCard({
               <Button
                 variant="link"
                 size="sm"
-                className="cursor-pointer p-0 text-card-foreground text-sm"
+                className="p-0 text-card-foreground text-sm"
               >
                 {leader.name}
               </Button>
@@ -223,7 +223,7 @@ export function GroupCard({
           <Button
             variant="link"
             size="sm"
-            className="cursor-pointer gap-1 px-0 text-card-foreground text-sm has-[>svg]:px-0"
+            className="gap-1 px-0 text-card-foreground text-sm has-[>svg]:px-0"
           >
             See more <ChevronRight className="ml-1 h-4 w-4" />
           </Button>

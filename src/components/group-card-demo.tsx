@@ -1,29 +1,31 @@
-import { GroupCard } from './group-card';
+import { GroupCard } from "./group-card";
+import { Separator } from "./ui/separator";
 
 export default function GroupCardDemo() {
   const exampleGroup = {
-    id: '1',
-    name: 'Proyecto Innovación Web3',
-    state: 'OPEN' as const,
-    language: 'Spanish' as const,
-    schedule: 'Weekends' as const,
-    target: 'Startup' as const,
+    id: "1",
+    name: "Proyecto Innovación Web3",
+    state: "OPEN" as const,
+    language: "Spanish" as const,
+    schedule: "Weekends" as const,
+    target: "Startup" as const,
     rolesNeeded: [
-      { role: 'FRONTEND' as const, filled: 1, total: 2 },
-      { role: 'BACKEND' as const, filled: 0, total: 2 },
-      { role: 'DESIGNER' as const, filled: 1, total: 1 },
-      { role: 'PM' as const, filled: 1, total: 1 },
-      { role: 'DEVOPS' as const, filled: 0, total: 1 },
+      { role: "FRONTEND" as const, filled: 1, total: 2 },
+      { role: "BACKEND" as const, filled: 0, total: 2 },
+      { role: "DESIGNER" as const, filled: 1, total: 1 },
+      { role: "PM" as const, filled: 1, total: 1 },
+      { role: "DEVOPS" as const, filled: 0, total: 1 },
     ],
     leader: {
-      name: 'Ana García',
-      avatar: '/placeholder.svg?height=32&width=32',
+      name: "Ana García",
+      avatar: "/placeholder.svg?height=32&width=32",
     },
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col justify-center gap-2">
+    <div className="flex min-h-screen w-full flex-col justify-center">
       <GroupCard {...exampleGroup} />
+      <Separator />
 
       <GroupCard
         id="2"
@@ -33,15 +35,16 @@ export default function GroupCardDemo() {
         schedule="Nights"
         target="Learning"
         rolesNeeded={[
-          { role: 'FULLSTACK', filled: 2, total: 3 },
-          { role: 'MOBILE', filled: 1, total: 1 },
-          { role: 'DESIGNER', filled: 0, total: 1 },
+          { role: "FULLSTACK", filled: 2, total: 3 },
+          { role: "MOBILE", filled: 1, total: 1 },
+          { role: "DESIGNER", filled: 0, total: 1 },
         ]}
         leader={{
-          name: 'Carlos Ruiz',
-          avatar: '/placeholder.svg?height=32&width=32',
+          name: "Carlos Ruiz",
+          avatar: "/placeholder.svg?height=32&width=32",
         }}
       />
+      <Separator />
 
       <GroupCard
         id="3"
@@ -51,16 +54,17 @@ export default function GroupCardDemo() {
         schedule="Mornings"
         target="Job"
         rolesNeeded={[
-          { role: 'MOBILE', filled: 1, total: 2 },
-          { role: 'BACKEND', filled: 1, total: 1 },
-          { role: 'DESIGNER', filled: 0, total: 1 },
-          { role: 'PM', filled: 0, total: 1 },
+          { role: "MOBILE", filled: 1, total: 2 },
+          { role: "BACKEND", filled: 1, total: 1 },
+          { role: "DESIGNER", filled: 0, total: 1 },
+          { role: "PM", filled: 0, total: 1 },
         ]}
         leader={{
-          name: 'Elena Martín',
-          avatar: '/placeholder.svg?height=32&width=32',
+          name: "Elena Martín",
+          avatar: "/placeholder.svg?height=32&width=32",
         }}
       />
+      <Separator />
 
       <GroupCard
         id="3"
@@ -70,16 +74,17 @@ export default function GroupCardDemo() {
         schedule="Mornings"
         target="Job"
         rolesNeeded={[
-          { role: 'MOBILE', filled: 1, total: 2 },
-          { role: 'BACKEND', filled: 1, total: 1 },
-          { role: 'DESIGNER', filled: 0, total: 1 },
-          { role: 'PM', filled: 0, total: 1 },
+          { role: "MOBILE", filled: 1, total: 2 },
+          { role: "BACKEND", filled: 1, total: 1 },
+          { role: "DESIGNER", filled: 0, total: 1 },
+          { role: "PM", filled: 0, total: 1 },
         ]}
         leader={{
-          name: 'Elena Martín',
-          avatar: '/placeholder.svg?height=32&width=32',
+          name: "Elena Martín",
+          avatar: "/placeholder.svg?height=32&width=32",
         }}
       />
+      <Separator />
 
       <GroupCard
         id="3"
@@ -89,16 +94,17 @@ export default function GroupCardDemo() {
         schedule="Mornings"
         target="Job"
         rolesNeeded={[
-          { role: 'MOBILE', filled: 2, total: 2 },
-          { role: 'BACKEND', filled: 1, total: 1 },
-          { role: 'DESIGNER', filled: 1, total: 1 },
-          { role: 'PM', filled: 1, total: 1 },
+          { role: "MOBILE", filled: 2, total: 2 },
+          { role: "BACKEND", filled: 1, total: 1 },
+          { role: "DESIGNER", filled: 1, total: 1 },
+          { role: "PM", filled: 1, total: 1 },
         ]}
         leader={{
-          name: 'Elena Martín',
-          avatar: '/placeholder.svg?height=32&width=32',
+          name: "Elena Martín",
+          avatar: "/placeholder.svg?height=32&width=32",
         }}
       />
+      <Separator />
     </div>
   );
 }
