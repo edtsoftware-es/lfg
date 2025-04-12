@@ -53,6 +53,12 @@ JOIN LATERAL (
 ) roles_json ON true
 ```
 
+Obtenemos el ID del rol en la lista, no su nombre, por lo que realizamos la equivalencia en el front con el enum en lugar de obtener el nombre realizando un join de la tabla roles
+
+Obviamos el LEFT JOIN ya que no necesitamos y no deberían existir grupos sin roles, así eliminamos datos innecesarios de la consulta
+
+Utilizamos LATERAL para una mejor agrupación de los datos
+
 ## Obtener los datos del grupo
 
 Obtener grupo por ID + group_roles (en group_roles se ha utilizado como relación el nombre del usuario para no hacer join por id de la tabla users).
