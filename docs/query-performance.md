@@ -64,6 +64,52 @@ Utilizamos LATERAL para una mejor agrupación de los datos
 Obtener grupo por ID + group_roles (en group_roles se ha utilizado como relación el nombre del usuario para no hacer join por id de la tabla users).
 Misma operación de ordenación desde el front.
 
+-Obtener información del grupo y cupos
+
+```sql
+SELECT
+  g.id,
+  g.owner,
+  g.icon,
+  g.name,
+  g.description,
+  g.requirements,
+  g.target,
+  g.schedule,
+  g.language,
+  g.state,
+  g.created_at AS "createdAt",
+  COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+FROM
+  groups g
+JOIN LATERAL (
+  SELECT json_agg(
+    json_build_object(
+      'userName', gr.user_name,
+      'role', gr.role
+    )
+    ORDER BY gr.role ASC
+  ) AS roles
+  FROM group_roles gr
+  WHERE gr.group_id = g.id
+  LIMIT 8
+) roles_json ON true
+``
+
+-Con el campo de userName de los cupos (group_roles), realizar una consulta a user_profile para obtener los datos necesarios para la lista de miembros
+
+```sql
+SELECT userName, name, icon, role, bio
+
+```
+
+-Solicitudes
+
+userName
+rol
+message
+createdAt
+
 ## Obtener comentarios del grupo
 
 Obtener comentarios del grupo (group_comments) por ID de grupo.

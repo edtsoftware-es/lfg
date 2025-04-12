@@ -115,6 +115,7 @@ export const userProfile = pgTable(
     userName: varchar('user_name').references(() => users.username),
     name: varchar('name', { length: 40 }),
     bio: varchar('bio', { length: 160 }),
+    aboutMe: varchar('about_me', { length: 450 }),
     icon: varchar('icon', { length: 255 }).default('placeholder'),
     role: integer('role')
       .notNull()
@@ -155,8 +156,8 @@ export const groups = pgTable(
     }),
     icon: text('icon').notNull().default('placeholder'),
     name: varchar('name', { length: 255 }).notNull(),
-    description: text('description').notNull(),
-    requirements: text('requirements'),
+    description: varchar('description', { length: 1000 }).notNull(),
+    requirements: varchar('requirements', { length: 1000 }).notNull(),
     target: targetEnum('target').notNull(),
     schedule: scheduleEnum('schedule').notNull().default('ANY'),
     language: languageEnum('language').notNull(),
@@ -172,6 +173,8 @@ export const groups = pgTable(
     index('idx_groups_owner').on(table.owner),
     index('idx_groups_state').on(table.state),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
+    check('description_min_length', sql`LENGTH(${table.name}) > 160`),
+    check('requirements_min_length', sql`LENGTH(${table.name}) > 160`),
   ]
 );
 
