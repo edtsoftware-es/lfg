@@ -8,17 +8,17 @@
 ## Obtener mis datos de usuario
 
 ```sql
-SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
+SELECT user_id, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
 FROM user_profile
-WHERE id = [user_id];
+WHERE user_id = [ID del usuario];
 ```
 
-## Obtener los datos de otro usuario
+## Obtener los datos de otro usuario (generalmente por nombre)
 
 ```sql
-SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
+SELECT user_id, user_name, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
 FROM user_profile
-WHERE user_name = :user_name;
+WHERE user_name = [Nombre de usuario];
 ```
 
 ## Obtener todos los roles
