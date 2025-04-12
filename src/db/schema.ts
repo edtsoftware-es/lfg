@@ -150,9 +150,9 @@ export const groups = pgTable(
   'groups',
   {
     id: serial('id').primaryKey().notNull(),
-    ownerId: integer('owner_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    owner: varchar('owner').references(() => users.username, {
+      onDelete: 'cascade',
+    }),
     icon: text('icon').notNull().default('placeholder'),
     name: varchar('name', { length: 255 }).notNull(),
     description: text('description').notNull(),
@@ -169,7 +169,7 @@ export const groups = pgTable(
       .notNull(),
   },
   (table) => [
-    index('idx_groups_owner').on(table.ownerId),
+    index('idx_groups_owner').on(table.owner),
     index('idx_groups_state').on(table.state),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
   ]
@@ -180,8 +180,8 @@ export type NewGroup = InferInsertModel<typeof groups>;
 
 export const groupsRelations = relations(groups, ({ one, many }) => ({
   owner: one(users, {
-    fields: [groups.ownerId],
-    references: [users.id],
+    fields: [groups.owner],
+    references: [users.username],
   }),
   roles: many(groupRoles),
   applies: many(applies),
