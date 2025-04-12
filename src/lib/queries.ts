@@ -1,8 +1,8 @@
 import { unstable_cache } from './unstable-cache';
 
 import { db } from '@/db/drizzle';
-import { groups, roles, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { groups, roles, userProfile, users } from '@/db/schema';
+import { type SQL, eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { verifyToken } from './session';
 
@@ -31,15 +31,69 @@ export async function getUser() {
   return user[0];
 }
 
+export const getUserProfile = unstable_cache(
+  async (userIdentifier: string | number) => {
+    if (!userIdentifier) {
+      return null;
+    }
+
+    let query: SQL<unknown>;
+    if (typeof userIdentifier === 'number') {
+      query = eq(userProfile.userId, userIdentifier);
+    } else {
+      query = eq(userProfile.userName, userIdentifier);
+    }
+
+    const profile = await db
+      .select({
+        userName: userProfile.userName,
+        name: userProfile.name,
+        bio: userProfile.bio,
+        icon: userProfile.icon,
+        role: userProfile.role,
+        email: userProfile.email,
+        location: userProfile.location,
+        skills: userProfile.skills,
+        linkedin: userProfile.linkdin,
+        twitter: userProfile.twitter,
+        instagram: userProfile.instagram,
+        github: userProfile.github,
+      })
+      .from(userProfile)
+      .where(query)
+      .limit(1);
+
+    if (profile.length === 0) {
+      return null;
+    }
+
+    return profile[0];
+  },
+  ['profile'],
+  {
+    revalidate: 60 * 60 * 2,
+  }
+);
+
+export type UserProfile = Awaited<ReturnType<typeof getUserProfile>>;
+
 export const getRoles = unstable_cache(
   () => {
-    return db.select().from(roles);
+    return db
+      .select({
+        id: roles.id,
+        name: roles.name,
+        img: roles.img,
+      })
+      .from(roles);
   },
   ['roles'],
   {
     revalidate: 60 * 60 * 2,
   }
 );
+
+export type Role = Awaited<ReturnType<typeof getRoles>>;
 
 export const getGroups = unstable_cache(
   () => {
