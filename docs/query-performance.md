@@ -39,7 +39,7 @@ SELECT
   COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
 FROM
   groups g
-LEFT JOIN LATERAL (
+JOIN LATERAL (
   SELECT json_agg(
     json_build_object(
       'userName', gr.user_name,
