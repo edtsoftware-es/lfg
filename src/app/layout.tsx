@@ -104,12 +104,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               >
                 <div className="flex items-center gap-2">
                   <Avatar className="size-14">
-                    <AvatarImage src="/vibrant-street-market.png" alt="User" />
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="User"
+                    />
                     <AvatarFallback>UN</AvatarFallback>
                   </Avatar>
                   <div className="hidden lg:block">
-                    <p className="font-medium text-sm">Username</p>
-                    <p className="text-muted-foreground text-xs">@username</p>
+                    <p className="font-semibold text-base">Username</p>
+                    <p className="text-muted-foreground text-sm">@username</p>
                   </div>
                 </div>
                 <Settings className="mr-4 hidden size-4 lg:block" />
