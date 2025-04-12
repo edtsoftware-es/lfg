@@ -2,13 +2,17 @@
 // import { RegisterForm } from '@/components/auth/register-form';
 import GroupCardDemo from '@/components/group-card-demo';
 import { Separator } from '@/components/ui/separator';
+import { getGroupsWithRoles } from '@/lib/queries';
 // import { Button } from '@/components/ui/button';
 // import { signOut } from '@/lib/actions/auth';
 // import { getRoles, getUser } from '@/lib/queries';
 
-export default function Home() {
+export default async function Home() {
   // const roles = await getRoles();
   // const user = await getUser();
+  const groups = await getGroupsWithRoles();
+
+  console.log(groups);
 
   return (
     <div className="flex h-full">

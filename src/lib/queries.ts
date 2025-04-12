@@ -2,7 +2,8 @@ import { unstable_cache } from './unstable-cache';
 
 import { db } from '@/db/drizzle';
 import { groups, roles, userProfile, users } from '@/db/schema';
-import { type SQL, eq } from 'drizzle-orm';
+
+import { type SQL, eq, sql } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { verifyToken } from './session';
 
@@ -104,3 +105,34 @@ export const getGroups = unstable_cache(
     revalidate: 60 * 60 * 2,
   }
 );
+
+export async function getGroupsWithRoles() {
+  const query = await db.execute(sql`
+    SELECT
+      g.id,
+      g.owner_name,
+      g.name,
+      g.target,
+      g.schedule,
+      g.language,
+      g.state,
+      g.created_at,
+      COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+    FROM
+      groups g
+    JOIN LATERAL (
+      SELECT json_agg(
+        json_build_object(
+          'userName', gr.user_name,
+          'role', gr.role
+        )
+        ORDER BY gr.role ASC
+      ) AS roles
+      FROM group_roles gr
+      WHERE gr.group_id = g.id
+      LIMIT 8
+    ) roles_json ON true
+  `);
+
+  return query.rows;
+}
