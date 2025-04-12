@@ -33,7 +33,7 @@ export const targetEnum = pgEnum('target_enum', [
 ]);
 export const scheduleEnum = pgEnum('schedule_enum', [
   'MORNINGS',
-  'AFTERNOON',
+  'AFTERNOONS',
   'WEEKENDS',
   'NIGHTS',
   'ANY',
@@ -171,7 +171,6 @@ export const groups = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     owner_name: varchar('owner_name').references(() => users.userName),
-    icon: text('icon').notNull().default('placeholder'),
     name: varchar('name', { length: 255 }).notNull(),
     description: varchar('description', { length: 1000 }).notNull(),
     requirements: varchar('requirements', { length: 1000 }).notNull(),
@@ -191,8 +190,8 @@ export const groups = pgTable(
     index('idx_groups_owner').on(table.owner_id),
     index('idx_groups_state').on(table.state),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
-    check('description_min_length', sql`LENGTH(${table.name}) > 160`),
-    check('requirements_min_length', sql`LENGTH(${table.name}) > 160`),
+    check('description_min_length', sql`LENGTH(${table.description}) > 160`),
+    check('requirements_min_length', sql`LENGTH(${table.requirements}) > 160`),
   ]
 );
 
@@ -233,7 +232,7 @@ export const groupRoles = pgTable(
   (table) => [
     index('idx_group_roles_group_id').on(table.groupId),
     index('idx_group_roles_user_name').on(table.userName),
-    uniqueIndex('idx_group_roles_user_name_group_id').on(
+    index('idx_group_roles_user_name_group_id').on(
       table.groupId,
       table.userName
     ),
@@ -316,7 +315,7 @@ export const groupComments = pgTable(
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
-    message: text('description').notNull(),
+    message: varchar('message', { length: 450 }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
