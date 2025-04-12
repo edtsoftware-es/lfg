@@ -9,7 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -18,7 +17,6 @@ import {
   Home,
   LogOut,
   MessageSquare,
-  Moon,
   Plus,
   Search,
   Settings,
@@ -28,6 +26,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { NavItem } from '@/components/layout/nav-item';
+import { ThemeToggle } from '@/components/theme-toggle';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -119,23 +119,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
+                <Settings className="mr-2 size-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Moon className="mr-2 h-4 w-4" />
-                <span>Dark Mode</span>
-              </DropdownMenuItem>
+              <ThemeToggle />
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 size-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
