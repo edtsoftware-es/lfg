@@ -5,13 +5,20 @@
 - **Solo hacer select de los campos necesarios.**
 - **No modificar orden de los parámetros de búsqueda.**
 
-
-## Obtener datos de usuario (userProfile)
+## Obtener mis datos de usuario
 
 ```sql
-SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github
+SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
 FROM user_profile
 WHERE id = [user_id];
+```
+
+## Obtener los datos de otro usuario
+
+```sql
+SELECT userName, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
+FROM user_profile
+WHERE user_name = :user_name;
 ```
 
 ## Obtener todos los roles
@@ -28,14 +35,14 @@ Obtener todos los grupos (groups) + group_roles por ID del grupo. Necesario para
 ```sql
 SELECT
   g.id,
-  g.owner,
+  g.owner_name,
   g.icon,
   g.name,
   g.target,
   g.schedule,
   g.language,
   g.state,
-  g.created_at AS "createdAt",
+  g.created_at,
   COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
 FROM
   groups g
@@ -61,6 +68,8 @@ Utilizamos LATERAL para una mejor agrupación de los datos
 
 ## Obtener los datos del grupo
 
+No podemos reutilizar los datos de la llamada de getGroups, ya que estará cacheada, y puede que los datos de detalles del grupo no estén actualizados (miembros, estado, etc)
+
 Obtener grupo por ID + group_roles (en group_roles se ha utilizado como relación el nombre del usuario para no hacer join por id de la tabla users).
 Misma operación de ordenación desde el front.
 
@@ -69,7 +78,7 @@ Misma operación de ordenación desde el front.
 ```sql
 SELECT
   g.id,
-  g.owner,
+  g.owner_name,
   g.icon,
   g.name,
   g.description,
@@ -85,7 +94,7 @@ FROM
 JOIN LATERAL (
   SELECT json_agg(
     json_build_object(
-      'userName', gr.user_name,
+      'user_name', gr.user_name,
       'role', gr.role
     )
     ORDER BY gr.role ASC
@@ -94,46 +103,79 @@ JOIN LATERAL (
   WHERE gr.group_id = g.id
   LIMIT 8
 ) roles_json ON true
-``
-
--Con el campo de userName de los cupos (group_roles), realizar una consulta a user_profile para obtener los datos necesarios para la lista de miembros
-
-```sql
-SELECT userName, name, icon, role, bio
-
 ```
 
--Solicitudes
+-Con la lista de user names de la primera llamada y el id del grupo, obtenemos la información de perfil de los usuarios y el rol que desempeña en el grupo
 
-userName
-rol
-message
-createdAt
+**(Podríamos traspasar esta lógica al front, ya que tenemos la lista de user_names y rol que desempeñan en el grupo. por lo que se podría hacer solo el select de información del usuario y asignar el rol al nuevo objeto de "miembro del grupo)**
+
+```sql
+SELECT
+    u.user_name,
+    u.name,
+    u.icon,
+    u.bio,
+    g.role
+FROM
+    user_profile u
+JOIN
+    group_roles g ON u.user_name = g.user_name
+WHERE
+    g.group_id = :group_id
+    AND u.user_name IN (lista_de_usernames);
+```
 
 ## Obtener comentarios del grupo
 
 Obtener comentarios del grupo (group_comments) por ID de grupo.
 
+```sql
+SELECT
+    user_name,
+    message,
+    created_at
+FROM
+    group_comments
+WHERE
+    group_id = :group_id
+ORDER BY created_at ASC
+```
+
 ## Obtener applies del grupo:
 
 ```sql
-SELECT userName, role, message, createdAt
-FROM applies
-WHERE groupId = [groupID del grupo];
+SELECT
+    user_name,
+    role,
+    message,
+    state,
+    created_at
+FROM
+    applies
+WHERE
+    group_id = :group_id
 ```
-
-Si por diseño, los cupos/usuarios/roles, comentarios y applies quedan ocultos en la vista inicial, separar las llamadas (en total 4), si no, agrupar de la mejor forma.
 
 ## Obtener applies de un usuario
 
 ```sql
-SELECT ap.role, ap.createdAt, ap.state, ap.group.id, gp.name
-FROM applies ap
-JOIN groups gp ON ap.groupId = gp.id
-WHERE ap.userId = [id];
+SELECT
+    a.role,
+    a.message,
+    a.state,
+    a.created_at,
+    a.group_id,
+    g.name
+FROM
+    applies a
+JOIN
+    groups g ON a.group_id = g.id
+WHERE
+    a.user_id = :user_id
+ORDER BY a.created_at DESC
 ```
 
-Los valores de enums como horarios, estados, objetivos, que se necesitan para filtrar, creación de grupos etc., se obtienen de los tipos exportados en schema.ts:
+### Los valores de enums como horarios, estados, objetivos, que se necesitan para filtrar, creación de grupos etc., se obtienen de los tipos exportados en schema.ts:
 
 ```typescript
 export type LanguageType;

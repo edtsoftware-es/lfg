@@ -55,7 +55,7 @@ export const users = pgTable(
   'users',
   {
     id: serial('id').primaryKey().notNull(),
-    username: varchar('username', { length: 30 }).notNull().unique(),
+    userName: varchar('user_name', { length: 30 }).notNull().unique(),
     password: varchar('password', { length: 255 }).notNull(),
     disabled: boolean('disabled').default(false).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -66,8 +66,8 @@ export const users = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex('idx_users_username').on(table.username),
-    check('username_length_check', sql`LENGTH(${table.username}) > 2`),
+    uniqueIndex('idx_users_username').on(table.userName),
+    check('username_length_check', sql`LENGTH(${table.userName}) > 2`),
   ]
 );
 
@@ -112,7 +112,7 @@ export const userProfile = pgTable(
       .primaryKey()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    userName: varchar('user_name').references(() => users.username),
+    userName: varchar('user_name').references(() => users.userName),
     name: varchar('name', { length: 40 }),
     bio: varchar('bio', { length: 160 }),
     aboutMe: varchar('about_me', { length: 450 }),
@@ -151,9 +151,10 @@ export const groups = pgTable(
   'groups',
   {
     id: serial('id').primaryKey().notNull(),
-    owner: varchar('owner').references(() => users.username, {
-      onDelete: 'cascade',
-    }),
+    owner_id: integer('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    owner_name: varchar('owner_name').references(() => users.userName),
     icon: text('icon').notNull().default('placeholder'),
     name: varchar('name', { length: 255 }).notNull(),
     description: varchar('description', { length: 1000 }).notNull(),
@@ -162,6 +163,7 @@ export const groups = pgTable(
     schedule: scheduleEnum('schedule').notNull().default('ANY'),
     language: languageEnum('language').notNull(),
     state: groupStatesEnum('state').notNull().default('OPEN'),
+    deadline: timestamp('deadline', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -170,7 +172,7 @@ export const groups = pgTable(
       .notNull(),
   },
   (table) => [
-    index('idx_groups_owner').on(table.owner),
+    index('idx_groups_owner').on(table.owner_id),
     index('idx_groups_state').on(table.state),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
     check('description_min_length', sql`LENGTH(${table.name}) > 160`),
@@ -183,8 +185,8 @@ export type NewGroup = InferInsertModel<typeof groups>;
 
 export const groupsRelations = relations(groups, ({ one, many }) => ({
   owner: one(users, {
-    fields: [groups.owner],
-    references: [users.username],
+    fields: [groups.owner_id],
+    references: [users.id],
   }),
   roles: many(groupRoles),
   applies: many(applies),
@@ -199,7 +201,7 @@ export const groupRoles = pgTable(
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
-    userName: varchar('user_name').references(() => users.username, {
+    userName: varchar('user_name').references(() => users.userName, {
       onDelete: 'set null',
     }),
     role: integer('role')
@@ -214,7 +216,8 @@ export const groupRoles = pgTable(
   },
   (table) => [
     index('idx_group_roles_group_id').on(table.groupId),
-    uniqueIndex('idx_group_roles_user_composite').on(
+    index('idx_group_roles_user_name').on(table.userName),
+    uniqueIndex('idx_group_roles_user_name_group_id').on(
       table.groupId,
       table.userName
     ),
@@ -235,7 +238,7 @@ export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
   }),
   user: one(users, {
     fields: [groupRoles.userName],
-    references: [users.username],
+    references: [users.userName],
   }),
 }));
 
@@ -247,7 +250,7 @@ export const applies = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     userName: varchar('user_name')
-      .references(() => users.username)
+      .references(() => users.userName)
       .notNull(),
     message: varchar('message', { length: 144 }),
     role: integer('role')
@@ -293,13 +296,11 @@ export const groupComments = pgTable(
   'group_comments',
   {
     id: serial('id').primaryKey().notNull(),
-    userName: varchar('user_name').references(() => users.username, {
-      onDelete: 'cascade',
-    }),
+    userName: varchar('user_name').references(() => users.userName),
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
-    description: text('description').notNull(),
+    message: text('description').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -316,7 +317,7 @@ export type NewGroupComment = InferInsertModel<typeof groupComments>;
 export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
   user: one(users, {
     fields: [groupComments.userName],
-    references: [users.username],
+    references: [users.userName],
   }),
   group: one(groups, {
     fields: [groupComments.groupId],
