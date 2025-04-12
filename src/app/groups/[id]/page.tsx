@@ -1,12 +1,14 @@
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Target, Crown, Globe, Clock } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { GroupStatus } from '@/components/group-status';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { roleConfig } from '@/constants';
+import { getGroupById } from '@/lib/queries';
+import { cn } from '@/lib/utils';
+import { Clock, Crown, Globe, Target } from 'lucide-react';
+import type { PageProps } from '../../../../.next/types/app/groups/[id]/page';
 
 const rolesNeeded = [
   { role: 'FRONTEND' as const, filled: 1, total: 2 },
@@ -144,7 +146,11 @@ function DetailsCard() {
   );
 }
 
-export default function Webo() {
+export default async function Webo({ params }: PageProps) {
+  const { id } = await params;
+  const group = await getGroupById(+id);
+  console.log(group);
+
   return (
     <div className="flex h-full">
       <div className="flex flex-1 flex-col">

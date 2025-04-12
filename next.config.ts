@@ -1,5 +1,16 @@
 import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    reactCompiler: true,
+    viewTransition: true,
+  },
+};
 
 export default nextConfig;

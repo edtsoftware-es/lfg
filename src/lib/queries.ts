@@ -106,8 +106,9 @@ export const getGroups = unstable_cache(
   }
 );
 
-export async function getGroupsWithRoles() {
-  const query = await db.execute(sql`
+export const getGroupsWithRoles = unstable_cache(
+  async () => {
+    const query = await db.execute(sql`
     SELECT
       g.id,
       g.owner_name,
@@ -134,5 +135,48 @@ export async function getGroupsWithRoles() {
     ) roles_json ON true
   `);
 
-  return query.rows;
-}
+    return query.rows;
+  },
+  ['groups'],
+  { revalidate: 60 * 60 * 2 }
+);
+
+export const getGroupById = unstable_cache(
+  async (groupId: number) => {
+    const result = await db.execute(sql`
+    SELECT
+      g.id,
+      g.owner_name,
+      g.name,
+      g.description,
+      g.requirements,
+      g.target,
+      g.schedule,
+      g.language,
+      g.state,
+      g.created_at AS "createdAt",
+      COALESCE(
+        (
+          SELECT json_agg(
+            json_build_object(
+              'user_name', gr.user_name,
+              'role', gr.role
+            )
+            ORDER BY gr.role ASC
+          )
+          FROM group_roles gr
+          WHERE gr.group_id = g.id
+        ),
+        '[]'::json
+      ) AS "groupRoles"
+    FROM
+      groups g
+    WHERE
+      g.id = ${groupId}
+  `);
+
+    return result.rows[0];
+  },
+  ['group'],
+  { revalidate: 60 * 60 * 2 }
+);

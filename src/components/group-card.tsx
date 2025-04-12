@@ -7,11 +7,11 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { roleConfig } from '@/constants';
 import { cn } from '@/lib/utils';
+import type { Language, RoleNeeded, Schedule, StudyTarget } from '@/types';
 import { ChevronRight, Clock, Crown, Globe, Target } from 'lucide-react';
 import Link from 'next/link';
-import type { Language, RoleNeeded, Schedule, StudyTarget } from '@/types';
-import { roleConfig } from '@/constants';
 import { type GroupStatus, GroupStatusAbsolute } from './group-status';
 
 type GroupCardProps = {
@@ -39,7 +39,7 @@ export function GroupCard({
   leader,
 }: GroupCardProps) {
   return (
-    <Link href={`/groups/${id}`}>
+    <Link href={`/groups/${id}`} prefetch>
       <Card
         className={cn(
           'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
