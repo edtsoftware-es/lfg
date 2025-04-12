@@ -36,7 +36,6 @@ Obtener todos los grupos (groups) + group_roles por ID del grupo. Necesario para
 SELECT
   g.id,
   g.owner_name,
-  g.icon,
   g.name,
   g.target,
   g.schedule,
@@ -79,7 +78,6 @@ Misma operación de ordenación desde el front.
 SELECT
   g.id,
   g.owner_name,
-  g.icon,
   g.name,
   g.description,
   g.requirements,
@@ -88,21 +86,24 @@ SELECT
   g.language,
   g.state,
   g.created_at AS "createdAt",
-  COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+  COALESCE(
+    (
+      SELECT json_agg(
+        json_build_object(
+          'user_name', gr.user_name,
+          'role', gr.role
+        )
+        ORDER BY gr.role ASC
+      )
+      FROM group_roles gr
+      WHERE gr.group_id = g.id
+    ),
+    '[]'::json
+  ) AS "groupRoles"
 FROM
   groups g
-JOIN LATERAL (
-  SELECT json_agg(
-    json_build_object(
-      'user_name', gr.user_name,
-      'role', gr.role
-    )
-    ORDER BY gr.role ASC
-  ) AS roles
-  FROM group_roles gr
-  WHERE gr.group_id = g.id
-  LIMIT 8
-) roles_json ON true
+WHERE
+  g.id = 1
 ```
 
 -Con la lista de user names de la primera llamada y el id del grupo, obtenemos la información de perfil de los usuarios y el rol que desempeña en el grupo
