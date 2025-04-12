@@ -85,6 +85,22 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   userGroups: many(usersToGroup),
 }));
 
+export const feedback = pgTable(
+  'feedback',
+  {
+    id: serial('id').primaryKey().notNull(),
+    email: varchar('email', { length: 160 }),
+    message: varchar('message', { length: 450 }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [check('message_min_length', sql`LENGTH(${table.message}) > 20`)]
+);
+
+export type FeedBack = InferSelectModel<typeof feedback>;
+export type NewFeedBack = InferInsertModel<typeof feedback>;
+
 export const roles = pgTable('roles', {
   id: serial('id').primaryKey().notNull(),
   name: varchar('name', { length: 50 }).notNull().unique(),
