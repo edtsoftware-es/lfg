@@ -53,7 +53,7 @@ export default function Webo() {
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-10 flex flex-col">
           <div className="bg-background/95 pt-1 backdrop-blur-sm">
-            <div className="flex h-16 items-center px-4 ">
+            <div className="flex h-16 items-center px-4">
               <h2 className="font-bold text-xl">Webo</h2>
             </div>
           </div>
