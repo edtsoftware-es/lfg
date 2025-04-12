@@ -103,7 +103,7 @@ SELECT
 FROM
   groups g
 WHERE
-  g.id = 1
+  g.id = [ID del grupo]
 ```
 
 -Con la lista de user names de la primera llamada y el id del grupo, obtenemos la información de perfil de los usuarios y el rol que desempeña en el grupo
@@ -122,8 +122,8 @@ FROM
 JOIN
     group_roles g ON u.user_name = g.user_name
 WHERE
-    g.group_id = :group_id
-    AND u.user_name IN (lista_de_usernames);
+    g.group_id = [ID del grupo]
+AND u.user_name IN ([Lista de userNames] ej: -> 'johndoe',NULL, 'janedoe');
 ```
 
 ## Obtener comentarios del grupo
@@ -138,7 +138,7 @@ SELECT
 FROM
     group_comments
 WHERE
-    group_id = :group_id
+    group_id = [ID del grupo]
 ORDER BY created_at ASC
 ```
 
@@ -154,10 +154,10 @@ SELECT
 FROM
     applies
 WHERE
-    group_id = :group_id
+    group_id = [ID del grupo]
 ```
 
-## Obtener applies de un usuario
+## Obtener mis applies
 
 ```sql
 SELECT
@@ -172,7 +172,7 @@ FROM
 JOIN
     groups g ON a.group_id = g.id
 WHERE
-    a.user_id = :user_id
+    a.user_id = [ID del usuario]
 ORDER BY a.created_at DESC
 ```
 
