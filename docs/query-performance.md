@@ -25,6 +25,34 @@ FROM roles;
 
 Obtener todos los grupos (groups) + group_roles por ID del grupo. Necesario para mostrar toda la información de las cards. Realizar filtrado + ordenación de roles, cupos disponibles, etc desde el front.
 
+```sql
+SELECT
+  g.id,
+  g.owner,
+  g.icon,
+  g.name,
+  g.target,
+  g.schedule,
+  g.language,
+  g.state,
+  g.created_at AS "createdAt",
+  COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+FROM
+  groups g
+LEFT JOIN LATERAL (
+  SELECT json_agg(
+    json_build_object(
+      'userName', gr.user_name,
+      'role', gr.role
+    )
+    ORDER BY gr.role ASC
+  ) AS roles
+  FROM group_roles gr
+  WHERE gr.group_id = g.id
+  LIMIT 8
+) roles_json ON true
+```
+
 ## Obtener los datos del grupo
 
 Obtener grupo por ID + group_roles (en group_roles se ha utilizado como relación el nombre del usuario para no hacer join por id de la tabla users).
