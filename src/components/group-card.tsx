@@ -63,7 +63,7 @@ export function GroupCard({
         </CardHeader>
 
         <CardContent>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-1.5">
             {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
               const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
               const total = roles.length;
@@ -76,7 +76,7 @@ export function GroupCard({
                 <div
                   key={index}
                   className={cn(
-                    'flex items-center gap-2 rounded-lg px-2 py-1.5',
+                    'flex items-center gap-2 rounded-lg px-2 py-1',
                     'border border-card-800'
                   )}
                 >

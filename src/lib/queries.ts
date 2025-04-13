@@ -166,10 +166,11 @@ export const getGroupsWithRoles = unstable_cache(
   { revalidate: 60 * 60 * 2 }
 );
 
-export type GroupById = Omit<GroupWithRoles, "created_at"> & {
+export type GroupById = Omit<GroupWithRoles, "created_at" | "groupRoles"> & {
   description: string;
   requirements: string;
   createdAt: Date;
+  groupRoles: (Pick<GroupRole, "role"> & { user_name: string })[];
 };
 
 export const getGroupById = unstable_cache(

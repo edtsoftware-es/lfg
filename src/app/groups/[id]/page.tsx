@@ -26,7 +26,7 @@ async function Comments({
           key={index}
           className="space-y-4 rounded-lg border border-card-800 p-6"
         >
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center md:gap-4">
             <div className="flex items-center gap-2 pl-1">
               <Button
                 variant="link"
@@ -110,12 +110,12 @@ function DetailsTab({ group }: { group: GroupById }) {
           </Badge>
         </div>
 
-        <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
+        <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-1.5">
           {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
             const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
             const total = roles.length;
             const filled = roles.filter(
-              (role) => role.userName !== null
+              (role) => role.user_name !== null
             ).length;
             const isFilled = filled === total;
 
@@ -123,7 +123,7 @@ function DetailsTab({ group }: { group: GroupById }) {
               <div
                 key={index}
                 className={cn(
-                  'flex items-center gap-2 rounded-lg px-2 py-1.5',
+                  'flex items-center gap-2 rounded-lg px-2 py-1',
                   'border border-card-800'
                 )}
               >
