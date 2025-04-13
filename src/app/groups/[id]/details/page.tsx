@@ -11,6 +11,7 @@ import { RoleImage } from '@/components/role-image';
 import { Suspense } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 async function Comments({
   id,
@@ -21,11 +22,8 @@ async function Comments({
   return (
     <div className="mt-6 space-y-4">
       {groupComments.map((comment, index) => (
-        <div
-          key={index}
-          className="space-y-4 rounded-lg border border-card-800 p-6"
-        >
-          <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center md:gap-4">
+        <Card key={index} className="bg-background">
+          <CardHeader className="flex flex-col justify-between md:flex-row md:items-center md:gap-4">
             <div className="flex items-center gap-2 pl-1">
               <Button
                 variant="link"
@@ -41,9 +39,11 @@ async function Comments({
             <p className="text-muted-foreground text-sm">
               {comment.createdAt.toLocaleString()}
             </p>
-          </div>
-          <p className="text-base text-foreground">{comment.message}</p>
-        </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-base text-foreground">{comment.message}</p>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );
