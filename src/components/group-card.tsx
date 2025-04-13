@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,51 +6,35 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { roleConfig } from '@/constants';
 import { cn } from '@/lib/utils';
-import type { Language, RoleNeeded, Schedule, StudyTarget } from '@/types';
 import { ChevronRight, Clock, Crown, Globe, Target } from 'lucide-react';
 import Link from 'next/link';
-import { type GroupStatus, GroupStatusAbsolute } from './group-status';
-
-type GroupCardProps = {
-  id: string;
-  name: string;
-  status: GroupStatus;
-  language: Language;
-  schedule: Schedule;
-  target: StudyTarget;
-  rolesNeeded: RoleNeeded[];
-  leader: {
-    name: string;
-    avatar: string;
-  };
-};
+import { GroupStatusAbsolute } from './group-status';
+import { RoleImage } from './role-image';
+import { ROLES } from '@/constants';
+import type { GroupWithRoles } from '@/lib/queries';
 
 export function GroupCard({
-  id,
-  name,
-  status,
-  language,
-  schedule,
-  target,
-  rolesNeeded,
-  leader,
-}: GroupCardProps) {
+  group,
+}: {
+  group: GroupWithRoles;
+}) {
+  const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
+
   return (
-    <Link href={`/groups/${id}`} prefetch>
+    <Link href={`/groups/${group.id}`} prefetch>
       <Card
         className={cn(
           'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
           'gap-4 rounded-none border-0 bg-background p-0',
-          'hover:bg-muted-foreground/5 dark:hover:bg-foreground/[2%]'
+          'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
         )}
       >
-        <GroupStatusAbsolute status={status} />
+        <GroupStatusAbsolute status={group.state} />
 
         <CardHeader className="gap-3 pt-5">
           <h3 className="pl-2 font-bold text-card-foreground text-lg">
-            {name}
+            {group.name}
           </h3>
 
           <div className="flex flex-wrap gap-2">
@@ -60,44 +43,44 @@ export function GroupCard({
               className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
             >
               <Globe className="h-3 w-3 text-card-foreground" />
-              {language}
+              {group.language}
             </Badge>
             <Badge
               variant="outline"
               className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
             >
               <Clock className="h-3 w-3 text-card-foreground" />
-              {schedule}
+              {group.schedule}
             </Badge>
             <Badge
               variant="outline"
               className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
             >
               <Target className="h-3 w-3 text-card-foreground" />
-              {target}
+              {group.target}
             </Badge>
           </div>
         </CardHeader>
 
         <CardContent>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
-            {rolesNeeded.map((role, index) => {
-              const { icon, color } = roleConfig[role.role];
-              const isFilled = role.filled === role.total;
+            {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
+              const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
+              const total = roles.length;
+              const filled = roles.filter(
+                (role) => role.userName !== null
+              ).length;
+              const isFilled = filled === total;
 
               return (
                 <div
                   key={index}
                   className={cn(
-                    'flex items-center gap-2 rounded-lg px-2 py-1 transition-all',
+                    'flex items-center gap-2 rounded-lg px-2 py-1.5',
                     'border border-card-800'
                   )}
                 >
-                  <div
-                    className={`bg-gradient-to-br ${color} rounded-md p-1.5 text-white`}
-                  >
-                    {icon}
-                  </div>
+                  <RoleImage variant={roleName} />
                   <div className="flex flex-col">
                     <span
                       className={cn(
@@ -105,10 +88,10 @@ export function GroupCard({
                         isFilled ? 'text-primary' : 'text-muted-foreground'
                       )}
                     >
-                      {role.filled}/{role.total}
+                      {filled}/{total}
                     </span>
                     <span className="text-card-foreground text-xs capitalize">
-                      {role.role.toLowerCase()}
+                      {roleName.toLowerCase()}
                     </span>
                   </div>
                 </div>
@@ -117,23 +100,17 @@ export function GroupCard({
           </div>
         </CardContent>
 
-        <CardFooter className="mt-0 flex items-center justify-between pt-1 pb-4">
-          <div className="flex items-center gap-2.5">
-            <Avatar className="size-8">
-              <AvatarImage src={leader.avatar} alt={leader.name} />
-              <AvatarFallback>
-                {leader.name.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex items-center gap-1">
+        <CardFooter className="mt-0 flex items-center justify-between pb-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Crown className="ml-1 size-4" color="#ffaa00" />
               <Button
                 variant="link"
                 size="sm"
-                className="p-0 text-card-foreground text-sm"
+                className="p-0 font-semibold text-card-foreground text-sm"
               >
-                {leader.name}
+                {group.owner_name}
               </Button>
-              <Crown className="ml-1 size-4" color="#ffaa00" />
             </div>
           </div>
           <Button

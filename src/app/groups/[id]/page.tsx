@@ -1,157 +1,185 @@
 import { GroupStatus } from '@/components/group-status';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { roleConfig } from '@/constants';
-import { getGroupById, getGroupCommennts } from '@/lib/queries';
+import { getGroupById, getGroupCommennts, type GroupById } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { Clock, Crown, Globe, Target } from 'lucide-react';
+import { Clock, Crown, Globe, SendIcon, Target } from 'lucide-react';
 import type { PageProps } from '../../../../.next/types/app/groups/[id]/page';
+import { ROLES } from '@/constants';
+import { RoleImage } from '@/components/role-image';
+import { Suspense } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const rolesNeeded = [
-  { role: 'FRONTEND' as const, filled: 1, total: 2 },
-  { role: 'BACKEND' as const, filled: 0, total: 2 },
-  { role: 'DESIGNER' as const, filled: 1, total: 1 },
-  { role: 'PM' as const, filled: 1, total: 1 },
-  { role: 'DEVOPS' as const, filled: 0, total: 1 },
-];
+async function Comments({
+  id,
+  owner_name,
+}: { id: number; owner_name: string }) {
+  const groupComments = await getGroupCommennts(id);
 
-function DetailsCard() {
   return (
-    <div className="flex flex-col p-6">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-1">
-          <h2 className="bg-clip-text font-bold text-2xl text-foreground">
-            Grupo muy crema
-          </h2>
-
-          <GroupStatus status="open" />
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Avatar className="size-10">
-            <AvatarImage
-              src={'https://github.com/shadcn.png'}
-              alt={'Kalimero'}
-            />
-            <AvatarFallback>KA</AvatarFallback>
-          </Avatar>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="link"
-              size="sm"
-              className="p-0 text-card-foreground text-lg"
-            >
-              Kalimero
-            </Button>
-            <Crown className="ml-1 size-5" color="#ffaa00" />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-wrap gap-1.5">
-        <Badge
-          variant="outline"
-          className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground capitalize"
+    <div className="mt-6 space-y-4">
+      {groupComments.map((comment, index) => (
+        <div
+          key={index}
+          className="space-y-4 rounded-lg border border-card-800 p-6"
         >
-          <Globe className="h-3 w-3 text-card-foreground" />
-          Spanish
-        </Badge>
-        <Badge
-          variant="outline"
-          className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
-        >
-          <Clock className="h-3 w-3 text-card-foreground" />
-          Afternoon
-        </Badge>
-        <Badge
-          variant="outline"
-          className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
-        >
-          <Target className="h-3 w-3 text-card-foreground" />
-          Startup
-        </Badge>
-      </div>
-
-      <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
-        {rolesNeeded.map((role, index) => {
-          const { icon, color } = roleConfig[role.role];
-          const isFilled = role.filled === role.total;
-
-          return (
-            <div
-              key={index}
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-2 py-1 transition-all',
-                'border border-card-800'
-              )}
-            >
-              <div
-                className={`bg-gradient-to-br ${color} rounded-md p-1.5 text-white`}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 pl-1">
+              <Button
+                variant="link"
+                size="sm"
+                className="p-0 font-bold text-base text-foreground"
               >
-                {icon}
-              </div>
-              <div className="flex flex-col">
-                <span
-                  className={cn(
-                    'font-medium text-xs',
-                    isFilled ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                >
-                  {role.filled}/{role.total}
-                </span>
-                <span className="text-card-foreground text-xs capitalize">
-                  {role.role.toLowerCase()}
-                </span>
-              </div>
+                {comment.userName}
+              </Button>
+              {comment.userName === owner_name && (
+                <Crown className="size-5" color="#ffaa00" />
+              )}
             </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-10 space-y-4">
-        <h3 className="font-bold text-lg">Description</h3>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem
-          minus beatae blanditiis eos exercitationem perspiciatis consequuntur
-          ipsum assumenda eligendi nam, expedita corrupti facilis voluptate
-          eaque natus voluptas deleniti, ea nihil.
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil,
-          distinctio pariatur reiciendis impedit eaque ipsam adipisci? Illum in,
-          fugiat quibusdam modi cupiditate soluta deserunt? Incidunt tenetur
-          corporis molestiae voluptate earum!
-        </p>
-      </div>
-
-      <div className="mt-10 space-y-4">
-        <h3 className="font-bold text-lg">Requirements</h3>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem
-          minus beatae blanditiis eos exercitationem perspiciatis consequuntur
-          ipsum assumenda eligendi nam, expedita corrupti facilis voluptate
-          eaque natus voluptas deleniti, ea nihil.
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil,
-          distinctio pariatur reiciendis impedit eaque ipsam adipisci? Illum in,
-          fugiat quibusdam modi cupiditate soluta deserunt? Incidunt tenetur
-          corporis molestiae voluptate earum!
-        </p>
-      </div>
+            <p className="text-muted-foreground text-sm">
+              {comment.createdAt.toLocaleString()}
+            </p>
+          </div>
+          <p className="text-base text-foreground">{comment.message}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
-export default async function Webo({ params }: PageProps) {
+function CommentsSkeleton() {
+  return (
+    <div className="mt-6 space-y-4">
+      <Skeleton className="h-30 w-full rounded-lg" />
+      <Skeleton className="h-30 w-full rounded-lg" />
+      <Skeleton className="h-30 w-full rounded-lg" />
+    </div>
+  );
+}
+
+function DetailsTab({ group }: { group: GroupById }) {
+  const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
+
+  return (
+    <>
+      <div className="px-6 py-10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1">
+            <h2 className="bg-clip-text font-bold text-2xl text-foreground">
+              {group.name}
+            </h2>
+            <GroupStatus status="OPEN" />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="link"
+              size="sm"
+              className="p-0 font-semibold text-foreground text-lg"
+            >
+              {group.owner_name}
+            </Button>
+            <Crown className="size-5" color="#ffaa00" />
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-1.5">
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground capitalize"
+          >
+            <Globe className="h-3 w-3 text-card-foreground" />
+            {group.language}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
+          >
+            <Clock className="h-3 w-3 text-card-foreground" />
+            {group.schedule}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
+          >
+            <Target className="h-3 w-3 text-card-foreground" />
+            {group.target}
+          </Badge>
+        </div>
+
+        <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
+          {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
+            const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
+            const total = roles.length;
+            const filled = roles.filter(
+              (role) => role.userName !== null
+            ).length;
+            const isFilled = filled === total;
+
+            return (
+              <div
+                key={index}
+                className={cn(
+                  'flex items-center gap-2 rounded-lg px-2 py-1.5',
+                  'border border-card-800'
+                )}
+              >
+                <RoleImage variant={roleName} />
+                <div className="flex flex-col">
+                  <span
+                    className={cn(
+                      'font-medium text-xs',
+                      isFilled ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                  >
+                    {filled}/{total}
+                  </span>
+                  <span className="text-card-foreground text-xs capitalize">
+                    {roleName.toLowerCase()}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 space-y-4">
+          <h3 className="font-bold text-lg">Description</h3>
+          <p>{group.description}</p>
+        </div>
+
+        <div className="mt-10 space-y-4">
+          <h3 className="font-bold text-lg">Requirements</h3>
+          <p>{group.requirements}</p>
+        </div>
+      </div>
+      <Separator />
+      <div className="mb-5 px-6 py-10">
+        <h3 className="font-bold text-lg">Comments</h3>
+
+        <div className="mt-6 flex items-end gap-2 rounded-3xl bg-secondary p-3 transition-colors focus-within:bg-muted-foreground/15 dark:focus-within:bg-muted-foreground/25">
+          <Textarea
+            placeholder="What's on your mind?"
+            className="max-h-64 min-h-9 w-full resize-none rounded-2xl border-0 shadow-none focus-visible:ring-0 dark:bg-transparent"
+          />
+          <Button size="icon" className="rounded-full">
+            <SendIcon className="size-4" />
+          </Button>
+        </div>
+        <Suspense fallback={<CommentsSkeleton />}>
+          <Comments id={group.id} owner_name={group.owner_name} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
   const group = await getGroupById(+id);
-  const groupComments = await getGroupCommennts(id);
-  console.log(groupComments);
-  console.log(group);
 
   return (
     <div className="flex h-full">
@@ -190,7 +218,7 @@ export default async function Webo({ params }: PageProps) {
             </div>
           </div>
           <TabsContent value="details">
-            <DetailsCard />
+            <DetailsTab group={group} />
           </TabsContent>
           <TabsContent value="members">Members</TabsContent>
           <TabsContent value="requests">Requests</TabsContent>

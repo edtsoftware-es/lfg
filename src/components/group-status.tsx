@@ -1,17 +1,16 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
-
-export type GroupStatus = 'open' | 'ongoing' | 'closed' | 'rebuild' | 'done';
+import type { GroupStateType } from '@/db/schema';
 
 const statusVariants = cva('', {
   variants: {
     status: {
-      open: 'bg-primary',
-      ongoing: 'bg-on-going',
-      closed: 'bg-closed',
-      rebuild: 'bg-rebuild',
-      done: 'bg-done',
+      OPEN: 'bg-primary',
+      ONGOING: 'bg-on-going',
+      CLOSED: 'bg-closed',
+      REBUILD: 'bg-rebuild',
+      DONE: 'bg-done',
       default: 'bg-foreground',
     },
   },
@@ -23,7 +22,7 @@ const statusVariants = cva('', {
 export function GroupStatusAbsolute({
   status,
 }: VariantProps<typeof statusVariants> & {
-  status: GroupStatus;
+  status: GroupStateType;
 }) {
   return (
     <div className="group absolute top-0 right-0">
@@ -41,7 +40,7 @@ export function GroupStatusAbsolute({
             'absolute top-0 right-0 translate-x-full transform border-0 bg-clip-text py-1 font-black text-transparent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-active:translate-x-0 group-active:opacity-100'
           )}
         >
-          {status.toUpperCase()}
+          {status}
         </Badge>
       </div>
     </div>
@@ -51,7 +50,7 @@ export function GroupStatusAbsolute({
 export function GroupStatus({
   status,
 }: VariantProps<typeof statusVariants> & {
-  status: GroupStatus;
+  status: GroupStateType;
 }) {
   return (
     <div className="flex items-center">
@@ -63,7 +62,7 @@ export function GroupStatus({
           'border-0 bg-clip-text py-0 font-black text-base text-transparent'
         )}
       >
-        {status.toUpperCase()}
+        {status}
       </Badge>
     </div>
   );

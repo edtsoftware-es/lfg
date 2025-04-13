@@ -1,6 +1,6 @@
 // import { LoginForm } from '@/components/auth/login-form';
 // import { RegisterForm } from '@/components/auth/register-form';
-import GroupCardDemo from '@/components/group-card-demo';
+import { GroupCard } from '@/components/group-card';
 import { Separator } from '@/components/ui/separator';
 import { getGroupsWithRoles } from '@/lib/queries';
 // import { Button } from '@/components/ui/button';
@@ -11,8 +11,6 @@ export default async function Home() {
   // const roles = await getRoles();
   // const user = await getUser();
   const groups = await getGroupsWithRoles();
-
-  console.log(groups);
 
   return (
     <div className="flex h-full">
@@ -37,10 +35,14 @@ export default async function Home() {
           </div>
           <Separator />
         </div>
-        <GroupCardDemo />
+        {groups.map((group) => (
+          <div key={group.id}>
+            <GroupCard group={group} />
+            <Separator />
+          </div>
+        ))}
       </div>
       <Separator orientation="vertical" />
-
       <div className="hidden h-full w-64 md:block" />
     </div>
   );
