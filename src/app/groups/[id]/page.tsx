@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { roleConfig } from '@/constants';
-import { getGroupById } from '@/lib/queries';
+import { getGroupById, getGroupCommennts } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { Clock, Crown, Globe, Target } from 'lucide-react';
 import type { PageProps } from '../../../../.next/types/app/groups/[id]/page';
@@ -149,6 +149,8 @@ function DetailsCard() {
 export default async function Webo({ params }: PageProps) {
   const { id } = await params;
   const group = await getGroupById(+id);
+  const groupComments = await getGroupCommennts(id);
+  console.log(groupComments);
   console.log(group);
 
   return (

@@ -1,7 +1,7 @@
 import { unstable_cache } from './unstable-cache';
 
 import { db } from '@/db/drizzle';
-import { groups, roles, userProfile, users } from '@/db/schema';
+import { groupComments, groups, roles, userProfile, users } from '@/db/schema';
 
 import { type SQL, eq, sql } from 'drizzle-orm';
 import { cookies } from 'next/headers';
@@ -179,4 +179,21 @@ export const getGroupById = unstable_cache(
   },
   ['group'],
   { revalidate: 60 * 60 * 2 }
+);
+
+export const getGroupCommennts = unstable_cache(
+  (groupId: number) => {
+    return db
+      .select({
+        userName: groupComments.userName,
+        message: groupComments.message,
+        createdAt: groupComments.createdAt,
+      })
+      .from(groupComments)
+      .where(eq(groupComments.groupId, groupId));
+  },
+  ['comments'],
+  {
+    revalidate: 60 * 60 * 2,
+  }
 );
