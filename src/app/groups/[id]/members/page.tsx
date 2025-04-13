@@ -58,7 +58,7 @@ export default async function GroupMembers({ params }: PageProps) {
                 </p>
               </CardContent>
               <CardFooter className="flex items-center justify-between pb-5">
-                <div className="flex items-center gap-2 rounded-lg border border-card-800 px-3 py-1">
+                <div className="flex items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
                   <RoleImage variant={'FRONTEND'} />
                   <span className="text-card-foreground text-sm capitalize">
                     frontend

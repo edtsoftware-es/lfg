@@ -90,21 +90,21 @@ export default async function GroupDetails({ params }: PageProps) {
         <div className="mt-6 flex flex-wrap gap-1.5">
           <Badge
             variant="outline"
-            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground capitalize"
+            className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground capitalize dark:border-input"
           >
             <Globe className="h-3 w-3 text-card-foreground" />
             {group.language}
           </Badge>
           <Badge
             variant="outline"
-            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
+            className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Clock className="h-3 w-3 text-card-foreground" />
             {group.schedule}
           </Badge>
           <Badge
             variant="outline"
-            className="flex items-center gap-1 border-card-800 bg-card-800/50 px-2.5 py-1 text-card-foreground"
+            className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Target className="h-3 w-3 text-card-foreground" />
             {group.target}
@@ -123,7 +123,7 @@ export default async function GroupDetails({ params }: PageProps) {
             return (
               <div
                 key={index}
-                className="flex items-center gap-2 rounded-lg border border-card-800 px-2 py-1"
+                className="flex items-center gap-2 rounded-lg border px-2 py-1 dark:border-input"
               >
                 <RoleImage variant={roleName} />
                 <div className="flex flex-col">
