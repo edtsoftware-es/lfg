@@ -2,11 +2,10 @@ import { GroupStatus } from '@/components/group-status';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getGroupById, getGroupCommennts, type GroupById } from '@/lib/queries';
+import { getGroupById, getGroupCommennts } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { Clock, Crown, Globe, SendIcon, Target } from 'lucide-react';
-import type { PageProps } from '../../../../.next/types/app/groups/[id]/page';
+import type { PageProps } from '../../../../../.next/types/app/groups/[id]/details/page';
 import { ROLES } from '@/constants';
 import { RoleImage } from '@/components/role-image';
 import { Suspense } from 'react';
@@ -60,7 +59,9 @@ function CommentsSkeleton() {
   );
 }
 
-function DetailsTab({ group }: { group: GroupById }) {
+export default async function GroupDetails({ params }: PageProps) {
+  const { id } = await params;
+  const group = await getGroupById(+id);
   const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
 
   return (
@@ -174,58 +175,5 @@ function DetailsTab({ group }: { group: GroupById }) {
         </Suspense>
       </div>
     </>
-  );
-}
-
-export default async function GroupDetails({ params }: PageProps) {
-  const { id } = await params;
-  const group = await getGroupById(+id);
-
-  return (
-    <div className="flex h-full">
-      <div className="flex flex-1 flex-col">
-        <Tabs defaultValue="details" className="flex-1 gap-0">
-          <div className="sticky top-0 z-10 flex flex-col">
-            <div className="bg-background/95 pt-1 backdrop-blur-sm">
-              <div className="flex flex-col">
-                <div className="flex h-16 items-center">
-                  <TabsList className="size-full bg-background p-0">
-                    <TabsTrigger
-                      value="details"
-                      className="group relative h-full rounded-none border-none p-0 text-xl data-[state=active]:bg-background dark:data-[state=active]:bg-background"
-                    >
-                      Details
-                      <div className="absolute bottom-0 hidden h-1 w-full bg-primary group-data-[state=active]:block" />
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="members"
-                      className="group relative h-full rounded-none border-none p-0 text-xl data-[state=active]:bg-background dark:data-[state=active]:bg-background"
-                    >
-                      Members
-                      <div className="absolute bottom-0 hidden h-1 w-full bg-primary group-data-[state=active]:block" />
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="requests"
-                      className="group relative h-full rounded-none border-none p-0 text-xl data-[state=active]:bg-background dark:data-[state=active]:bg-background"
-                    >
-                      Requests
-                      <div className="absolute bottom-0 hidden h-1 w-full bg-primary group-data-[state=active]:block" />
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
-                <Separator />
-              </div>
-            </div>
-          </div>
-          <TabsContent value="details">
-            <DetailsTab group={group} />
-          </TabsContent>
-          <TabsContent value="members">Members</TabsContent>
-          <TabsContent value="requests">Requests</TabsContent>
-        </Tabs>
-      </div>
-      <Separator orientation="vertical" />
-      <div className="hidden h-full w-64 lg:block" />
-    </div>
   );
 }
