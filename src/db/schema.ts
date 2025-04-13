@@ -18,7 +18,6 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-// Enumerations - kept as is, enums are efficient in PostgreSQL
 export const languageEnum = pgEnum('language_enum', [
   'SPANISH',
   'ENGLISH',
@@ -34,9 +33,10 @@ export const targetEnum = pgEnum('target_enum', [
 ]);
 export const scheduleEnum = pgEnum('schedule_enum', [
   'MORNINGS',
-  'AFTERNOON',
+  'AFTERNOONS',
   'WEEKENDS',
   'NIGHTS',
+  'ANY',
 ]);
 export const applyStatesEnum = pgEnum('apply_states_enum', [
   'PENDING',
@@ -51,12 +51,11 @@ export const groupStatesEnum = pgEnum('group_states_enum', [
   'DONE',
 ]);
 
-// Tabla users - Using integer instead of bigint for most use cases
 export const users = pgTable(
   'users',
   {
     id: serial('id').primaryKey().notNull(),
-    username: varchar('username', { length: 30 }).notNull(),
+    userName: varchar('user_name', { length: 30 }).notNull().unique(),
     password: varchar('password', { length: 255 }).notNull(),
     disabled: boolean('disabled').default(false).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -67,16 +66,14 @@ export const users = pgTable(
       .notNull(),
   },
   (table) => [
-    uniqueIndex('idx_users_username').on(table.username),
-    check('username_length_check', sql`LENGTH(${table.username}) > 2`),
+    uniqueIndex('idx_users_username').on(table.userName),
+    check('username_length_check', sql`LENGTH(${table.userName}) > 2`),
   ]
 );
 
-// Tipos para users
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
 
-// Relaciones de users
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfile, {
     fields: [users.id],
@@ -88,7 +85,22 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   userGroups: many(usersToGroup),
 }));
 
-// Tabla roles - simplified
+export const feedback = pgTable(
+  'feedback',
+  {
+    id: serial('id').primaryKey().notNull(),
+    email: varchar('email', { length: 160 }),
+    message: varchar('message', { length: 450 }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [check('message_min_length', sql`LENGTH(${table.message}) > 20`)]
+);
+
+export type FeedBack = InferSelectModel<typeof feedback>;
+export type NewFeedBack = InferInsertModel<typeof feedback>;
+
 export const roles = pgTable('roles', {
   id: serial('id').primaryKey().notNull(),
   name: varchar('name', { length: 50 }).notNull().unique(),
@@ -101,40 +113,49 @@ export const roles = pgTable('roles', {
     .notNull(),
 });
 
-// Tipos para roles
 export type Role = InferSelectModel<typeof roles>;
 export type NewRole = InferInsertModel<typeof roles>;
 
-// Relaciones de roles
 export const rolesRelations = relations(roles, ({ many }) => ({
   groupRoles: many(groupRoles),
   userGroups: many(usersToGroup),
 }));
 
-// Tabla user_profile - simplified
-export const userProfile = pgTable('user_profile', {
-  userId: integer('user_id')
-    .primaryKey()
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  bio: varchar('bio', { length: 160 }),
-  icon: varchar('icon', { length: 255 }),
-  role: integer('role')
-    .notNull()
-    .references(() => roles.id),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const userProfile = pgTable(
+  'user_profile',
+  {
+    userId: integer('user_id')
+      .primaryKey()
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    userName: varchar('user_name').references(() => users.userName),
+    name: varchar('name', { length: 40 }),
+    bio: varchar('bio', { length: 160 }),
+    aboutMe: varchar('about_me', { length: 450 }),
+    icon: varchar('icon', { length: 255 }).default('placeholder'),
+    role: integer('role')
+      .notNull()
+      .references(() => roles.id),
+    email: varchar('email', { length: 144 }),
+    location: varchar('location', { length: 144 }),
+    skills: text('skills').array(),
+    linkdin: varchar('linkdin', { length: 240 }),
+    twitter: varchar('twitter', { length: 240 }),
+    instagram: varchar('instagram', { length: 240 }),
+    github: varchar('github', { length: 240 }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index('idx_user_profile_name').on(table.userName)]
+);
 
-// Tipos para user_profile
 export type UserProfile = InferSelectModel<typeof userProfile>;
 export type NewUserProfile = InferInsertModel<typeof userProfile>;
 
-// Relaciones de user_profile
 export const userProfileRelations = relations(userProfile, ({ one }) => ({
   user: one(users, {
     fields: [userProfile.userId],
@@ -142,17 +163,22 @@ export const userProfileRelations = relations(userProfile, ({ one }) => ({
   }),
 }));
 
-// Tabla groups - optimized
 export const groups = pgTable(
   'groups',
   {
     id: serial('id').primaryKey().notNull(),
-    ownerId: integer('owner_id')
+    owner_id: integer('owner_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    owner_name: varchar('owner_name').references(() => users.userName),
     name: varchar('name', { length: 255 }).notNull(),
-    description: text('description').notNull(),
+    description: varchar('description', { length: 1000 }).notNull(),
+    requirements: varchar('requirements', { length: 1000 }).notNull(),
+    target: targetEnum('target').notNull(),
+    schedule: scheduleEnum('schedule').notNull().default('ANY'),
+    language: languageEnum('language').notNull(),
     state: groupStatesEnum('state').notNull().default('OPEN'),
+    deadline: timestamp('deadline', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -161,69 +187,28 @@ export const groups = pgTable(
       .notNull(),
   },
   (table) => [
-    index('idx_groups_owner').on(table.ownerId),
+    index('idx_groups_owner').on(table.owner_id),
     index('idx_groups_state').on(table.state),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
+    check('description_min_length', sql`LENGTH(${table.description}) > 160`),
+    check('requirements_min_length', sql`LENGTH(${table.requirements}) > 160`),
   ]
 );
 
-// Tipos para groups
 export type Group = InferSelectModel<typeof groups>;
 export type NewGroup = InferInsertModel<typeof groups>;
 
-// Relaciones de groups
 export const groupsRelations = relations(groups, ({ one, many }) => ({
   owner: one(users, {
-    fields: [groups.ownerId],
+    fields: [groups.owner_id],
     references: [users.id],
   }),
-  filters: many(groupsFilter),
   roles: many(groupRoles),
   applies: many(applies),
   comments: many(groupComments),
   members: many(usersToGroup),
 }));
 
-// Tabla groups_filter - optimized with composite index
-export const groupsFilter = pgTable(
-  'groups_filter',
-  {
-    id: serial('id').primaryKey().notNull(),
-    groupId: integer('group_id')
-      .notNull()
-      .references(() => groups.id, { onDelete: 'cascade' }),
-    type: varchar('type', { length: 20 }).notNull(),
-    value: varchar('value', { length: 50 }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-  },
-  (table) => [
-    // Combined index for more efficient filtering
-    index('idx_groups_filter_composite').on(
-      table.groupId,
-      table.type,
-      table.value
-    ),
-  ]
-);
-
-// Tipos para groups_filter
-export type GroupFilter = InferSelectModel<typeof groupsFilter>;
-export type NewGroupFilter = InferInsertModel<typeof groupsFilter>;
-
-// Relaciones de groups_filter
-export const groupsFilterRelations = relations(groupsFilter, ({ one }) => ({
-  group: one(groups, {
-    fields: [groupsFilter.groupId],
-    references: [groups.id],
-  }),
-}));
-
-// Tabla group_roles - optimized
 export const groupRoles = pgTable(
   'group_roles',
   {
@@ -231,6 +216,9 @@ export const groupRoles = pgTable(
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
+    userName: varchar('user_name').references(() => users.userName, {
+      onDelete: 'set null',
+    }),
     role: integer('role')
       .notNull()
       .references(() => roles.id),
@@ -242,16 +230,18 @@ export const groupRoles = pgTable(
       .notNull(),
   },
   (table) => [
-    // Single composite index instead of two separate indexes
-    uniqueIndex('idx_group_roles_composite').on(table.groupId, table.role),
+    index('idx_group_roles_group_id').on(table.groupId),
+    index('idx_group_roles_user_name').on(table.userName),
+    index('idx_group_roles_user_name_group_id').on(
+      table.groupId,
+      table.userName
+    ),
   ]
 );
 
-// Tipos para group_roles
 export type GroupRole = InferSelectModel<typeof groupRoles>;
 export type NewGroupRole = InferInsertModel<typeof groupRoles>;
 
-// Relaciones de group_roles
 export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
   group: one(groups, {
     fields: [groupRoles.groupId],
@@ -261,9 +251,12 @@ export const groupRolesRelations = relations(groupRoles, ({ one }) => ({
     fields: [groupRoles.role],
     references: [roles.id],
   }),
+  user: one(users, {
+    fields: [groupRoles.userName],
+    references: [users.userName],
+  }),
 }));
 
-// Tabla applies - optimized
 export const applies = pgTable(
   'applies',
   {
@@ -271,6 +264,13 @@ export const applies = pgTable(
     userId: integer('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    userName: varchar('user_name')
+      .references(() => users.userName)
+      .notNull(),
+    message: varchar('message', { length: 144 }),
+    role: integer('role')
+      .notNull()
+      .references(() => roles.id),
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
@@ -283,22 +283,15 @@ export const applies = pgTable(
       .notNull(),
   },
   (table) => [
-    // Combined index for state filtering with user/group context
-    index('idx_applies_state_user_group').on(
-      table.state,
-      table.userId,
-      table.groupId
-    ),
-    // Unique constraint to prevent duplicate applications
-    uniqueIndex('idx_unique_user_group_apply').on(table.userId, table.groupId),
+    index('idx_applies_group_id').on(table.groupId),
+    index('idx_applies_user_id').on(table.userId),
+    index('idx_applies_user_id_state').on(table.userId, table.state),
   ]
 );
 
-// Tipos para applies
 export type Apply = InferSelectModel<typeof applies>;
 export type NewApply = InferInsertModel<typeof applies>;
 
-// Relaciones de applies
 export const appliesRelations = relations(applies, ({ one }) => ({
   user: one(users, {
     fields: [applies.userId],
@@ -308,20 +301,21 @@ export const appliesRelations = relations(applies, ({ one }) => ({
     fields: [applies.groupId],
     references: [groups.id],
   }),
+  roleRef: one(roles, {
+    fields: [applies.role],
+    references: [roles.id],
+  }),
 }));
 
-// Tabla group_comments - optimized
 export const groupComments = pgTable(
   'group_comments',
   {
     id: serial('id').primaryKey().notNull(),
-    userId: integer('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+    userName: varchar('user_name').references(() => users.userName),
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
-    description: text('description').notNull(),
+    message: varchar('message', { length: 450 }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -329,25 +323,16 @@ export const groupComments = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (table) => [
-    // Combined index since comments are typically queried by group
-    index('idx_group_comments_group_user').on(
-      table.groupId,
-      table.userId,
-      table.createdAt
-    ),
-  ]
+  (table) => [index('idx_group_comments_group_id').on(table.groupId)]
 );
 
-// Tipos para group_comments
 export type GroupComment = InferSelectModel<typeof groupComments>;
 export type NewGroupComment = InferInsertModel<typeof groupComments>;
 
-// Relaciones de group_comments
 export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
   user: one(users, {
-    fields: [groupComments.userId],
-    references: [users.id],
+    fields: [groupComments.userName],
+    references: [users.userName],
   }),
   group: one(groups, {
     fields: [groupComments.groupId],
@@ -355,7 +340,6 @@ export const groupCommentsRelations = relations(groupComments, ({ one }) => ({
   }),
 }));
 
-// Tabla users_to_group - optimized
 export const usersToGroup = pgTable(
   'users_to_group',
   {
@@ -376,21 +360,12 @@ export const usersToGroup = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (table) => [
-    // Combined index for role-based group membership queries
-    index('idx_users_to_group_group_role').on(table.groupId, table.role),
-    // Index for user's group membership queries
-    index('idx_users_to_group_user').on(table.userId),
-    // Unique constraint
-    uniqueIndex('idx_unique_user_group').on(table.userId, table.groupId),
-  ]
+  (table) => [index('idx_users_to_group_user').on(table.userId)]
 );
 
-// Tipos para users_to_group
 export type UserToGroup = InferSelectModel<typeof usersToGroup>;
 export type NewUserToGroup = InferInsertModel<typeof usersToGroup>;
 
-// Relaciones de users_to_group
 export const usersToGroupRelations = relations(usersToGroup, ({ one }) => ({
   user: one(users, {
     fields: [usersToGroup.userId],
@@ -406,14 +381,12 @@ export const usersToGroupRelations = relations(usersToGroup, ({ one }) => ({
   }),
 }));
 
-// Tipo para los valores de las enumeraciones
 export type LanguageType = (typeof languageEnum.enumValues)[number];
 export type TargetType = (typeof targetEnum.enumValues)[number];
 export type ScheduleType = (typeof scheduleEnum.enumValues)[number];
 export type ApplyStateType = (typeof applyStatesEnum.enumValues)[number];
 export type GroupStateType = (typeof groupStatesEnum.enumValues)[number];
 
-// Tipos con relaciones incluidas
 export interface UserWithRelations extends User {
   profile?: UserProfile;
   ownedGroups?: Group[];
@@ -424,7 +397,6 @@ export interface UserWithRelations extends User {
 
 export interface GroupWithRelations extends Group {
   owner?: User;
-  filters?: GroupFilter[];
   roles?: GroupRole[];
   applies?: Apply[];
   comments?: GroupComment[];
@@ -447,13 +419,11 @@ export interface GroupCommentWithRelations extends GroupComment {
   group?: Group;
 }
 
-// Exportación de todas las tablas para operaciones en bloque
 export const schema = {
   users,
   userProfile,
   roles,
   groups,
-  groupsFilter,
   groupRoles,
   applies,
   groupComments,
