@@ -123,10 +123,7 @@ export default async function GroupDetails({ params }: PageProps) {
             return (
               <div
                 key={index}
-                className={cn(
-                  'flex items-center gap-2 rounded-lg px-2 py-1',
-                  'border border-card-800'
-                )}
+                className="flex items-center gap-2 rounded-lg border border-card-800 px-2 py-1"
               >
                 <RoleImage variant={roleName} />
                 <div className="flex flex-col">

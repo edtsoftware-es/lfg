@@ -75,10 +75,7 @@ export function GroupCard({
               return (
                 <div
                   key={index}
-                  className={cn(
-                    'flex items-center gap-2 rounded-lg px-2 py-1',
-                    'border border-card-800'
-                  )}
+                  className="flex items-center gap-2 rounded-lg border border-card-800 px-2 py-1"
                 >
                   <RoleImage variant={roleName} />
                   <div className="flex flex-col">
@@ -116,9 +113,9 @@ export function GroupCard({
           <Button
             variant="link"
             size="sm"
-            className="gap-1 px-0 text-card-foreground text-sm has-[>svg]:px-0"
+            className="gap-2 px-0 text-card-foreground text-sm has-[>svg]:px-0"
           >
-            See more <ChevronRight className="ml-1 size-4" />
+            See more <ChevronRight className="size-4" />
           </Button>
         </CardFooter>
       </Card>
