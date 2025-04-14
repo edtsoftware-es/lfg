@@ -6,13 +6,13 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { ROLES } from '@/constants';
+import type { GroupWithRoles } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Clock, Crown, Globe, Target } from 'lucide-react';
 import Link from 'next/link';
 import { GroupStatusAbsolute } from './group-status';
 import { RoleImage } from './role-image';
-import { ROLES } from '@/constants';
-import type { GroupWithRoles } from '@/lib/queries';
 
 export function GroupCard({
   group,
@@ -22,7 +22,7 @@ export function GroupCard({
   const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
 
   return (
-    <Link href={`/groups/${group.id}/details`} prefetch>
+    <Link href={`/group/${group.id}/details`} prefetch>
       <Card
         className={cn(
           'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',

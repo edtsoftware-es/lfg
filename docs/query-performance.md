@@ -124,7 +124,7 @@ JOIN
     group_roles g ON u.user_name = g.user_name
 WHERE
     g.group_id = [ID del grupo]
-AND u.user_name IN ([Lista de userNames] ej: -> 'johndoe',NULL, 'janedoe');
+AND u.user_name IN ('johndoe',NULL, 'janedoe');
 ```
 
 ## Obtener comentarios del grupo
@@ -147,15 +147,18 @@ ORDER BY created_at ASC
 
 ```sql
 SELECT
-    user_name AS "userName",
-    role,
-    message,
-    state,
-    created_at AS "createdAt"
+    a.user_name AS "userName",
+    a.role,
+    a.message,
+    a.status,
+    a.created_at AS "createdAt",
+    u.icon
 FROM
-    applies
+    applies a
+JOIN
+    user_profile u ON u.user_name = a.user_name
 WHERE
-    group_id = [ID del grupo]
+    group_id = 1
 ```
 
 ## Obtener mis applies
@@ -164,7 +167,7 @@ WHERE
 SELECT
     a.role,
     a.message,
-    a.state,
+    a.status,
     a.created_at AS "createdAt",
     a.group_id AS "groupId",
     g.name

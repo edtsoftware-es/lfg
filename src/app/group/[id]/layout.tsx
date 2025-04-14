@@ -1,14 +1,14 @@
-import { Separator } from '@/components/ui/separator';
-import type { LayoutProps } from '../../../../.next/types/app/groups/[id]/layout';
 import { Tabs } from '@/components/layout/tabs';
+import { Separator } from '@/components/ui/separator';
+import type { LayoutProps } from '../../../../.next/types/app/group/[id]/layout';
 
 export default async function GroupLayout({ children, params }: LayoutProps) {
   const { id } = await params;
 
   const tabs = [
-    { name: 'Details', path: `/groups/${id}/details` },
-    { name: 'Members', path: `/groups/${id}/members` },
-    { name: 'Requests', path: `/groups/${id}/requests` },
+    { name: 'Details', path: `/group/${id}/details` },
+    { name: 'Members', path: `/group/${id}/members` },
+    { name: 'Requests', path: `/group/${id}/requests` },
   ];
 
   return (

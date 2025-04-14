@@ -1,17 +1,17 @@
 import { GroupStatus } from '@/components/group-status';
+import { RoleImage } from '@/components/role-image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import { ROLES } from '@/constants';
 import { getGroupById, getGroupCommennts } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { Clock, Crown, Globe, SendIcon, Target } from 'lucide-react';
-import type { PageProps } from '../../../../../.next/types/app/groups/[id]/details/page';
-import { ROLES } from '@/constants';
-import { RoleImage } from '@/components/role-image';
 import { Suspense } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
 
 async function Comments({ id, ownerName }: { id: number; ownerName: string }) {
   const groupComments = await getGroupCommennts(id);
