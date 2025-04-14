@@ -112,6 +112,7 @@ WHERE
 
 ```sql
 SELECT
+    u.user_id AS "userId",
     u.user_name AS "userName",
     u.name,
     u.icon,
