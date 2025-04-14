@@ -18,6 +18,16 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+export const iconEnum = pgEnum('icon_enum', [
+  'WEBO1',
+  'WEBO2',
+  'WEBO3',
+  'WEBO4',
+  'WEBO5',
+  'WEBO6',
+  'WEBO7',
+  'WEBO8',
+]);
 export const languageEnum = pgEnum('language_enum', [
   'SPANISH',
   'ENGLISH',
@@ -38,12 +48,12 @@ export const scheduleEnum = pgEnum('schedule_enum', [
   'NIGHTS',
   'ANY',
 ]);
-export const applyStatesEnum = pgEnum('apply_states_enum', [
+export const applyStatusEnum = pgEnum('apply_status_enum', [
   'PENDING',
   'ACCEPTED',
   'REJECTED',
 ]);
-export const groupStatesEnum = pgEnum('group_states_enum', [
+export const groupStatusEnum = pgEnum('group_status_enum', [
   'OPEN',
   'ONGOING',
   'CLOSED',
@@ -132,7 +142,7 @@ export const userProfile = pgTable(
     name: varchar('name', { length: 40 }),
     bio: varchar('bio', { length: 160 }),
     aboutMe: varchar('about_me', { length: 450 }),
-    icon: varchar('icon', { length: 255 }).default('placeholder'),
+    icon: iconEnum('icon').notNull().default('WEBO1'),
     role: integer('role')
       .notNull()
       .references(() => roles.id),
@@ -167,17 +177,18 @@ export const groups = pgTable(
   'groups',
   {
     id: serial('id').primaryKey().notNull(),
-    owner_id: integer('owner_id')
+    ownerId: integer('owner_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    owner_name: varchar('owner_name').references(() => users.userName),
+    ownerName: varchar('owner_name').references(() => users.userName),
     name: varchar('name', { length: 255 }).notNull(),
+    skills: text('skills').array(),
     description: varchar('description', { length: 1000 }).notNull(),
     requirements: varchar('requirements', { length: 1000 }).notNull(),
     target: targetEnum('target').notNull(),
     schedule: scheduleEnum('schedule').notNull().default('ANY'),
     language: languageEnum('language').notNull(),
-    state: groupStatesEnum('state').notNull().default('OPEN'),
+    status: groupStatusEnum('status').notNull().default('OPEN'),
     deadline: timestamp('deadline', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
@@ -187,8 +198,8 @@ export const groups = pgTable(
       .notNull(),
   },
   (table) => [
-    index('idx_groups_owner').on(table.owner_id),
-    index('idx_groups_state').on(table.state),
+    index('idx_groups_owner').on(table.ownerId),
+    index('idx_groups_status').on(table.status),
     check('name_min_length', sql`LENGTH(${table.name}) > 5`),
     check('description_min_length', sql`LENGTH(${table.description}) > 160`),
     check('requirements_min_length', sql`LENGTH(${table.requirements}) > 160`),
@@ -200,7 +211,7 @@ export type NewGroup = InferInsertModel<typeof groups>;
 
 export const groupsRelations = relations(groups, ({ one, many }) => ({
   owner: one(users, {
-    fields: [groups.owner_id],
+    fields: [groups.ownerId],
     references: [users.id],
   }),
   roles: many(groupRoles),
@@ -274,7 +285,7 @@ export const applies = pgTable(
     groupId: integer('group_id')
       .notNull()
       .references(() => groups.id, { onDelete: 'cascade' }),
-    state: applyStatesEnum('state').notNull().default('PENDING'),
+    status: applyStatusEnum('status').notNull().default('PENDING'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -285,7 +296,7 @@ export const applies = pgTable(
   (table) => [
     index('idx_applies_group_id').on(table.groupId),
     index('idx_applies_user_id').on(table.userId),
-    index('idx_applies_user_id_state').on(table.userId, table.state),
+    index('idx_applies_user_id_status').on(table.userId, table.status),
   ]
 );
 
@@ -381,11 +392,12 @@ export const usersToGroupRelations = relations(usersToGroup, ({ one }) => ({
   }),
 }));
 
+export type IconType = (typeof iconEnum.enumValues)[number];
 export type LanguageType = (typeof languageEnum.enumValues)[number];
 export type TargetType = (typeof targetEnum.enumValues)[number];
 export type ScheduleType = (typeof scheduleEnum.enumValues)[number];
-export type ApplyStateType = (typeof applyStatesEnum.enumValues)[number];
-export type GroupStateType = (typeof groupStatesEnum.enumValues)[number];
+export type ApplyStatusType = (typeof applyStatusEnum.enumValues)[number];
+export type GroupStatusType = (typeof groupStatusEnum.enumValues)[number];
 
 export interface UserWithRelations extends User {
   profile?: UserProfile;

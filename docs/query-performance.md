@@ -8,7 +8,7 @@
 ## Obtener mis datos de usuario
 
 ```sql
-SELECT user_id, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
+SELECT user_id AS "userId", name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at AS "createdAt"
 FROM user_profile
 WHERE user_id = [ID del usuario];
 ```
@@ -16,7 +16,7 @@ WHERE user_id = [ID del usuario];
 ## Obtener los datos de otro usuario (generalmente por nombre)
 
 ```sql
-SELECT user_id, user_name, name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at
+SELECT user_id AS "userId", user_name AS "userName", name, bio, icon, role, email, location, skills, linkdin, twitter, instagram, github, created_at AS "createdAt"
 FROM user_profile
 WHERE user_name = [Nombre de usuario];
 ```
@@ -35,13 +35,13 @@ Obtener todos los grupos (groups) + group_roles por ID del grupo. Necesario para
 ```sql
 SELECT
   g.id,
-  g.owner_name,
+  g.owner_name AS "ownerName",
   g.name,
   g.target,
   g.schedule,
   g.language,
   g.state,
-  g.created_at,
+  g.created_at AS "createdAt",
   COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
 FROM
   groups g
@@ -77,7 +77,7 @@ Misma operación de ordenación desde el front.
 ```sql
 SELECT
   g.id,
-  g.owner_name,
+  g.owner_name AS "ownerName",
   g.name,
   g.description,
   g.requirements,
@@ -112,7 +112,7 @@ WHERE
 
 ```sql
 SELECT
-    u.user_name,
+    u.user_name AS "userName",
     u.name,
     u.icon,
     u.bio,
@@ -132,9 +132,9 @@ Obtener comentarios del grupo (group_comments) por ID de grupo.
 
 ```sql
 SELECT
-    user_name,
+    user_name AS "userName",
     message,
-    created_at
+    created_at AS "createdAt"
 FROM
     group_comments
 WHERE
@@ -146,11 +146,11 @@ ORDER BY created_at ASC
 
 ```sql
 SELECT
-    user_name,
+    user_name AS "userName",
     role,
     message,
     state,
-    created_at
+    created_at AS "createdAt"
 FROM
     applies
 WHERE
@@ -164,8 +164,8 @@ SELECT
     a.role,
     a.message,
     a.state,
-    a.created_at,
-    a.group_id,
+    a.created_at AS "createdAt",
+    a.group_id AS "groupId",
     g.name
 FROM
     applies a
