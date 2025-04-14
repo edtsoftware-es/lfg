@@ -29,7 +29,7 @@ import Link from 'next/link';
 import { NavItem } from '@/components/layout/nav-item';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { getSession } from '@/lib/session';
-import { LoginModal } from '@/components/auth/login-modal';
+import { LoginModalWrapper } from '@/components/auth/login-modal-wrapper';
 import { signOut } from '@/lib/actions/auth';
 import { getUser, getUserProfile } from '@/lib/queries';
 import { UserProfile } from '@/components/layout/user-profile';
@@ -108,7 +108,7 @@ async function MainLayout({ children }: { children: ReactNode }) {
               <UserProfile />
             </Suspense>
           ) : (
-            <LoginModal />
+            <LoginModalWrapper />
           )}
         </div>
         <Separator orientation="vertical" />
