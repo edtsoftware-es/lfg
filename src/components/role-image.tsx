@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 import Image, { type ImageProps } from 'next/image';
 
 const roleVariants = cva('', {
@@ -31,8 +31,8 @@ export function RoleImage({
       alt={`${variant?.toUpperCase() ?? 'Default'} role image`}
       src={roleVariants({ variant })}
       priority={true}
-      width={32}
-      height={32}
+      width={30}
+      height={30}
       className={cn(
         'h-auto w-auto rounded-full bg-primary p-1 dark:bg-transparent',
         className

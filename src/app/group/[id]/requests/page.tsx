@@ -7,6 +7,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { ROLES } from '@/constants';
 import { type GroupApplies, getGroupApplies } from '@/lib/queries';
 import { cn } from '@/lib/utils';
@@ -18,10 +19,23 @@ export default async function GroupRequests({ params }: PageProps) {
   const { id } = await params;
   const applies = await getGroupApplies(id);
 
+  if (applies.length === 0) {
+    return (
+      <div className="px-6 py-10">
+        <h2 className="bg-clip-text font-bold text-2xl text-foreground">
+          There are no applies yet
+        </h2>
+      </div>
+    );
+  }
+
   return (
     <>
       {applies.map((apply, index) => (
-        <ApplyItem key={index} {...apply} />
+        <div key={index}>
+          <ApplyItem {...apply} />
+          <Separator />
+        </div>
       ))}
     </>
   );
@@ -81,17 +95,17 @@ function ApplyItem({
           </div>
 
           {true && (
-            <div className="flex w-full items-center gap-2 sm:w-fit">
+            <div className="flex w-full min-w-[500px] items-center justify-end gap-2 sm:w-fit">
               <Button
                 variant="outline"
-                className="z-20 h-12.5 w-full shrink rounded-lg bg-transparent shadow-none hover:border-primary active:border-primary sm:w-fit dark:bg-transparent dark:hover:border-primary"
+                className="z-20 h-12.5 w-full shrink gap-1 rounded-lg bg-transparent shadow-none hover:border-primary active:border-primary sm:w-28 dark:bg-transparent dark:hover:border-primary"
               >
                 <Check className="size-4 text-primary" />
                 Accept
               </Button>
               <Button
                 variant="outline"
-                className="h-12.5 w-full shrink rounded-lg bg-transparent shadow-none hover:border-destructive active:border-destructive sm:w-fit dark:bg-transparent dark:hover:border-destructive"
+                className="h-12.5 w-full shrink gap-1 rounded-lg bg-transparent shadow-none hover:border-destructive active:border-destructive sm:w-28 dark:bg-transparent dark:hover:border-destructive"
               >
                 <X className="size-4 text-destructive" />
                 Reject

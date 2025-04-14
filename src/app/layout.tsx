@@ -4,34 +4,14 @@ import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Toaster } from '@/components/ui/sonner';
-import {
-  Home,
-  LogOut,
-  MessageSquare,
-  Plus,
-  Search,
-  Settings,
-  User,
-  Users,
-} from 'lucide-react';
+import { Home, MessageSquare, Plus, Search, User, Users } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { NavItem } from '@/components/layout/nav-item';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { getSession } from '@/lib/session';
 import { LoginModalWrapper } from '@/components/auth/login-modal-wrapper';
-import { signOut } from '@/lib/actions/auth';
-import { getUser, getUserProfile } from '@/lib/queries';
 import { UserProfile } from '@/components/layout/user-profile';
 
 const geistSans = Geist({
@@ -104,7 +84,11 @@ async function MainLayout({ children }: { children: ReactNode }) {
           </div>
 
           {session ? (
-            <Suspense fallback={<div className="h-14 w-14 animate-pulse rounded-full bg-muted" />}>
+            <Suspense
+              fallback={
+                <div className="h-14 w-14 animate-pulse rounded-full bg-muted" />
+              }
+            >
               <UserProfile />
             </Suspense>
           ) : (
