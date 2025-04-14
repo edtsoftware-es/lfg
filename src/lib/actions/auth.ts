@@ -23,7 +23,7 @@ export const signInAction = validatedAction(loginSchema, async (data) => {
       user: users,
     })
     .from(users)
-    .where(eq(users.username, username))
+    .where(eq(users.userName, username))
     .limit(1);
 
   if (user.length === 0) {
@@ -64,7 +64,7 @@ export const registerAction = validatedAction(registerSchema, async (data) => {
   const existingUser = await db
     .select()
     .from(users)
-    .where(eq(users.username, username))
+    .where(eq(users.userName, username))
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -74,7 +74,7 @@ export const registerAction = validatedAction(registerSchema, async (data) => {
   const passwordHash = await hashPassword(password);
 
   const newUser: NewUser = {
-    username,
+    userName: username,
     password: passwordHash,
   };
 
