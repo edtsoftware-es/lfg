@@ -7,7 +7,7 @@ import {
   roles,
   userProfile,
   users,
-  type GroupStateType,
+  type GroupStatusType,
   type LanguageType,
   type ScheduleType,
   type TargetType,
@@ -121,13 +121,13 @@ export type Group = Awaited<ReturnType<typeof getGroups>>;
 
 export type GroupWithRoles = {
   id: number;
-  owner_name: string;
+  ownerName: string;
   name: string;
   target: TargetType;
   schedule: ScheduleType;
   language: LanguageType;
-  state: GroupStateType;
-  created_at: Date;
+  status: GroupStatusType;
+  createdAt: Date;
   groupRoles: Pick<GroupRole, "role" | "userName">[];
 };
 
@@ -136,13 +136,13 @@ export const getGroupsWithRoles = unstable_cache(
     const query = await db.execute(sql`
     SELECT
       g.id,
-      g.owner_name,
+      g.owner_name as "ownerName",
       g.name,
       g.target,
       g.schedule,
       g.language,
-      g.state,
-      g.created_at,
+      g.status,
+      g.created_at as "createdAt",
       COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
     FROM
       groups g
@@ -166,11 +166,9 @@ export const getGroupsWithRoles = unstable_cache(
   { revalidate: 60 * 60 * 2 }
 );
 
-export type GroupById = Omit<GroupWithRoles, "created_at" | "groupRoles"> & {
+export type GroupById = GroupWithRoles & {
   description: string;
   requirements: string;
-  createdAt: Date;
-  groupRoles: (Pick<GroupRole, "role"> & { user_name: string })[];
 };
 
 export const getGroupById = unstable_cache(
@@ -178,20 +176,20 @@ export const getGroupById = unstable_cache(
     const result = await db.execute(sql`
     SELECT
       g.id,
-      g.owner_name,
+      g.owner_name as "ownerName",
       g.name,
       g.description,
       g.requirements,
       g.target,
       g.schedule,
       g.language,
-      g.state,
+      g.status,
       g.created_at AS "createdAt",
       COALESCE(
         (
           SELECT json_agg(
             json_build_object(
-              'user_name', gr.user_name,
+              'userName', gr.user_name,
               'role', gr.role
             )
             ORDER BY gr.role ASC

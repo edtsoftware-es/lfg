@@ -13,10 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-async function Comments({
-  id,
-  owner_name,
-}: { id: number; owner_name: string }) {
+async function Comments({ id, ownerName }: { id: number; ownerName: string }) {
   const groupComments = await getGroupCommennts(id);
 
   return (
@@ -32,7 +29,7 @@ async function Comments({
               >
                 {comment.userName}
               </Button>
-              {comment.userName === owner_name && (
+              {comment.userName === ownerName && (
                 <Crown className="size-5" color="#ffaa00" />
               )}
             </div>
@@ -81,7 +78,7 @@ export default async function GroupDetails({ params }: PageProps) {
               size="sm"
               className="p-0 font-semibold text-foreground text-lg"
             >
-              {group.owner_name}
+              {group.ownerName}
             </Button>
             <Crown className="size-5" color="#ffaa00" />
           </div>
@@ -116,7 +113,7 @@ export default async function GroupDetails({ params }: PageProps) {
             const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
             const total = roles.length;
             const filled = roles.filter(
-              (role) => role.user_name !== null
+              (role) => role.userName !== null
             ).length;
             const isFilled = filled === total;
 
@@ -168,7 +165,7 @@ export default async function GroupDetails({ params }: PageProps) {
           </Button>
         </div>
         <Suspense fallback={<CommentsSkeleton />}>
-          <Comments id={group.id} owner_name={group.owner_name} />
+          <Comments id={group.id} ownerName={group.ownerName} />
         </Suspense>
       </div>
     </>

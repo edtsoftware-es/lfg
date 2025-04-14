@@ -30,7 +30,7 @@ export function GroupCard({
           'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
         )}
       >
-        <GroupStatusAbsolute status={group.state} />
+        <GroupStatusAbsolute status={group.status} />
 
         <CardHeader className="gap-3 pt-5">
           <h3 className="pl-2 font-bold text-card-foreground text-lg">
@@ -106,7 +106,7 @@ export function GroupCard({
                 size="sm"
                 className="p-0 font-semibold text-card-foreground text-sm"
               >
-                {group.owner_name}
+                {group.ownerName}
               </Button>
             </div>
           </div>
