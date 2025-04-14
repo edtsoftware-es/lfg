@@ -1,9 +1,15 @@
 import { Separator } from '@/components/ui/separator';
-import { TabItem } from '@/components/layout/tab-item';
 import type { LayoutProps } from '../../../../.next/types/app/groups/[id]/layout';
+import { Tabs } from '@/components/layout/tabs';
 
 export default async function GroupLayout({ children, params }: LayoutProps) {
   const { id } = await params;
+
+  const tabs = [
+    { name: 'Details', path: `/groups/${id}/details` },
+    { name: 'Members', path: `/groups/${id}/members` },
+    { name: 'Requests', path: `/groups/${id}/requests` },
+  ];
 
   return (
     <div className="flex h-full">
@@ -11,17 +17,7 @@ export default async function GroupLayout({ children, params }: LayoutProps) {
         <div className="sticky top-0 z-10 flex flex-col">
           <div className="bg-background/95 pt-1 backdrop-blur-sm">
             <div className="flex flex-col">
-              <div className="flex h-16 w-full items-center justify-center">
-                <TabItem href={`/groups/${id}/details`} prefetch>
-                  Details
-                </TabItem>
-                <TabItem href={`/groups/${id}/members`} prefetch>
-                  Members
-                </TabItem>
-                <TabItem href={`/groups/${id}/requests`} prefetch>
-                  Requests
-                </TabItem>
-              </div>
+              <Tabs tabs={tabs} />
               <Separator />
             </div>
           </div>
