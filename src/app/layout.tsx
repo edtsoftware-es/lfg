@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -31,6 +32,7 @@ import { getSession } from '@/lib/session';
 import { LoginModal } from '@/components/auth/login-modal';
 import { signOut } from '@/lib/actions/auth';
 import { getUser, getUserProfile } from '@/lib/queries';
+import { UserProfile } from '@/components/layout/user-profile';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -49,11 +51,6 @@ export const metadata: Metadata = {
 
 async function MainLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
-  const user = session ? await getUser() : null;
-  const userProfile = user ? await getUserProfile(user.id) : null;
-
-
-
   return (
     <div className="flex min-h-screen justify-center bg-background">
       <header className="sticky top-0 left-0 flex h-screen w-20 lg:w-64">
@@ -107,47 +104,9 @@ async function MainLayout({ children }: { children: ReactNode }) {
           </div>
 
           {session ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="my-3 flex size-14 items-center justify-center gap-0 rounded-full p-0 has-[>svg]:px-0 lg:h-fit lg:w-full lg:justify-between lg:gap-2 lg:px-2 lg:py-2 lg:has-[>svg]:px-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <Avatar className="size-14">
-                      <AvatarImage
-                        src={userProfile?.icon || "https://github.com/shadcn.png"}
-                        alt={userProfile?.name || "User"}
-                      />
-                      <AvatarFallback>
-                        {userProfile?.name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="hidden lg:block">
-                      <p className="font-semibold text-base">{userProfile?.name || "User"}</p>
-                      <p className="text-muted-foreground text-sm">@{userProfile?.userName || "username"}</p>
-                    </div>
-                  </div>
-                  <Settings className="mr-4 hidden size-4 lg:block" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Settings className="mr-2 size-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <ThemeToggle />
-                <DropdownMenuSeparator />
-                <form action={signOut}>
-                  <DropdownMenuItem asChild>
-                    <button type="submit" className="w-full">
-                      <LogOut className="mr-2 size-4" />
-                      <span>Log out</span>
-                    </button>
-                  </DropdownMenuItem>
-                </form>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Suspense fallback={<div className="h-14 w-14 animate-pulse rounded-full bg-muted" />}>
+              <UserProfile />
+            </Suspense>
           ) : (
             <LoginModal />
           )}
