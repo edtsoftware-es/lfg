@@ -5,7 +5,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import type { PageProps } from '../../../../../.next/types/app/groups/[id]/requests/page';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronRight, Crown, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';

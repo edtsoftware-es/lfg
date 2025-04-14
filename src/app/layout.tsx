@@ -71,7 +71,7 @@ function MainLayout({ children }: { children: ReactNode }) {
                 <MessageSquare className="size-7" />
                 <span className="hidden lg:block">Webo</span>
               </NavItem>
-              <NavItem href="/groups">
+              <NavItem href="/groups/in-progress">
                 <Users className="size-7" />
                 <span className="hidden lg:block">Groups</span>
               </NavItem>

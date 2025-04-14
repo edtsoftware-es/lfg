@@ -22,7 +22,7 @@ export function GroupCard({
   const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
 
   return (
-    <Link href={`/groups/${group.id}/details`} prefetch>
+    <Link href={`/group/${group.id}/details`} prefetch>
       <Card
         className={cn(
           'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
