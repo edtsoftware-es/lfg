@@ -71,6 +71,8 @@ export const getUserProfile = unstable_cache(
         twitter: userProfile.twitter,
         instagram: userProfile.instagram,
         github: userProfile.github,
+        aboutMe: userProfile.aboutMe,
+        createdAt: userProfile.createdAt,
       })
       .from(userProfile)
       .where(query)
