@@ -15,7 +15,7 @@ import {
   getGroupMembersInfo,
 } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import type { PageProps } from '../../../../../.next/types/app/group/[id]/members/page';
 
@@ -90,7 +90,7 @@ function MemberCard({ bio, role, userName }: Partial<GroupMemberInfo>) {
               size="sm"
               className="gap-2 px-0 text-card-foreground text-sm has-[>svg]:px-0"
             >
-              See more <ChevronRight className="size-4" />
+              <Eye className="size-4" /> View profile
             </Button>
           </CardFooter>
         </Card>

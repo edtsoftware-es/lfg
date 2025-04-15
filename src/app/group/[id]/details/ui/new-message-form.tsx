@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { sendCommentAction } from '@/lib/actions/send-comment';
 import type { ActionState } from '@/lib/middleware';
-import { Loader, SendIcon } from 'lucide-react';
+import { SendIcon } from 'lucide-react';
 import { useActionState } from 'react';
 
 export function NewMessageForm({
   groupId,
   userName,
 }: { groupId: number; userName?: string }) {
-  const [newCommentState, newCommentFormAction, newCommentIsPending] =
+  const [newCommentState, newCommentFormAction, _newCommentIsPending] =
     useActionState<ActionState, FormData>(sendCommentAction, { error: '' });
 
   if (!userName) {
@@ -32,11 +32,7 @@ export function NewMessageForm({
         <input hidden type="hidden" name="userName" value={userName} />
         <input hidden type="hidden" name="groupId" value={groupId} />
         <Button size="icon" className="rounded-full">
-          {newCommentIsPending ? (
-            <Loader className="size-4 animate-spin" />
-          ) : (
-            <SendIcon className="size-4" />
-          )}
+          <SendIcon className="size-4" />
         </Button>
       </form>
       {newCommentState?.error && (
