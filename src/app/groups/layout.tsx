@@ -2,6 +2,7 @@ import { Tabs } from '@/components/layout/tabs';
 import { Separator } from '@/components/ui/separator';
 import { getUserGroupsWithRoles } from '@/lib/queries';
 import { getSession } from '@/lib/session';
+import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 const tabs = [
@@ -16,7 +17,7 @@ export default async function GroupsLayout({
   const session = await getSession();
 
   if (!session) {
-    return null;
+    return redirect('/');
   }
 
   const userGroups = await getUserGroupsWithRoles(session.user.userName);

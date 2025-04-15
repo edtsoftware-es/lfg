@@ -37,7 +37,7 @@ export async function UserProfile() {
               <p className="font-semibold text-base">
                 {userProfile?.name || 'User'}
               </p>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-start text-muted-foreground text-sm">
                 @{userProfile?.userName || 'username'}
               </p>
             </div>
