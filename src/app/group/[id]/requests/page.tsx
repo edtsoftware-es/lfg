@@ -1,6 +1,4 @@
-import { Separator } from '@/components/ui/separator';
-import { getGroupApplies } from '@/lib/queries';
-import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
+import { RequestActionButtons } from '@/components/request-action-buttons';
 import { RoleImage } from '@/components/role-image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,12 +8,14 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { ROLES } from '@/constants';
+import { getGroupApplies } from '@/lib/queries';
 import type { GroupApplies } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { ChevronRight } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import Link from 'next/link';
-import { RequestActionButtons } from '@/components/request-action-buttons';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
 
 export default async function GroupRequests({ params }: PageProps) {
   const { id } = await params;
@@ -97,7 +97,7 @@ export function RequestCard({
               size="sm"
               className="col-start-3 row-start-1 h-full gap-2 justify-self-end px-0 text-card-foreground text-sm has-[>svg]:px-0"
             >
-              See more <ChevronRight className="size-4" />
+              <Eye className="size-4" /> View profile
             </Button>
 
             {true && (
