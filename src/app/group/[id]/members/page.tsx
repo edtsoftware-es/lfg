@@ -15,7 +15,7 @@ import {
   getGroupMembersInfo,
 } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Crown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import type { PageProps } from '../../../../../.next/types/app/group/[id]/members/page';
 
@@ -33,14 +33,7 @@ export default async function GroupMembers({ params }: PageProps) {
     <>
       {membersInfo.map((member, index) => (
         <div key={index}>
-          <MemberItem
-            bio={member.bio}
-            icon={member.icon}
-            userName={member.userName}
-            role={member.role}
-            userId={member.userId}
-            name={member.name}
-          />
+          <MemberCard {...member} />
           <Separator />
         </div>
       ))}
@@ -48,12 +41,12 @@ export default async function GroupMembers({ params }: PageProps) {
   );
 }
 
-function MemberItem({ bio, role, userName }: Partial<GroupMemberInfo>) {
+function MemberCard({ bio, role, userName }: Partial<GroupMemberInfo>) {
   const roleName = ROLES[Number(role) as keyof typeof ROLES];
 
   return (
     <>
-      <Link href={`/users/${userName}`} prefetch>
+      <Link href={`/user/${userName}`} prefetch>
         <Card
           className={cn(
             'w-full cursor-pointer overflow-hidden transition-all duration-200',
@@ -66,9 +59,9 @@ function MemberItem({ bio, role, userName }: Partial<GroupMemberInfo>) {
               <Avatar className="size-12">
                 <AvatarImage
                   src={'https://github.com/shadcn.png'}
-                  alt={'userName'}
+                  alt={userName}
                 />
-                <AvatarFallback>US</AvatarFallback>
+                <AvatarFallback>{userName?.slice(0, 2)}</AvatarFallback>
               </Avatar>
               <div className="flex items-center gap-2">
                 <Button
@@ -78,18 +71,17 @@ function MemberItem({ bio, role, userName }: Partial<GroupMemberInfo>) {
                 >
                   {userName}
                 </Button>
-                <Crown className="size-4" color="#ffaa00" />
               </div>
             </div>
           </CardHeader>
           <CardContent className="ml-1">
             <p className="text-base text-foreground">{bio}</p>
           </CardContent>
-          <CardFooter className="flex items-center justify-between pb-5">
+          <CardFooter className="flex items-center justify-between gap-2 pb-5">
             <div className="flex items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
               <RoleImage variant={'FRONTEND'} />
               <span className="text-card-foreground text-sm capitalize">
-                {roleName}
+                {roleName.toLowerCase()}
               </span>
             </div>
 
