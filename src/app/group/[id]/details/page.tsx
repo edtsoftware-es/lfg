@@ -1,65 +1,20 @@
 import { GroupStatus } from '@/components/group-status';
-import { RoleImage } from '@/components/role-image';
+import { RoleList } from '@/components/role-list';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Textarea } from '@/components/ui/textarea';
-import { ROLES } from '@/constants';
 import { getGroupById, getGroupCommennts } from '@/lib/queries';
-import { cn } from '@/lib/utils';
-import { Clock, Crown, Globe, SendIcon, Target } from 'lucide-react';
+import { getSession } from '@/lib/session';
+import { Clock, Crown, Globe, Target } from 'lucide-react';
 import { Suspense } from 'react';
 import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
-
-async function Comments({ id, ownerName }: { id: number; ownerName: string }) {
-  const groupComments = await getGroupCommennts(id);
-
-  return (
-    <div className="mt-6 space-y-4">
-      {groupComments.map((comment, index) => (
-        <Card key={index} className="bg-background">
-          <CardHeader className="flex flex-col justify-between md:flex-row md:items-center md:gap-4">
-            <div className="flex items-center gap-2 pl-1">
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 font-bold text-base text-foreground"
-              >
-                {comment.userName}
-              </Button>
-              {comment.userName === ownerName && (
-                <Crown className="size-5" color="#ffaa00" />
-              )}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              {comment.createdAt.toLocaleString()}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <p className="text-base text-foreground">{comment.message}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function CommentsSkeleton() {
-  return (
-    <div className="mt-6 space-y-4">
-      <Skeleton className="h-30 w-full rounded-lg" />
-      <Skeleton className="h-30 w-full rounded-lg" />
-      <Skeleton className="h-30 w-full rounded-lg" />
-    </div>
-  );
-}
+import { NewMessageForm } from './ui/new-message-form';
 
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
-  const group = await getGroupById(+id);
-  const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
+  const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
 
   return (
     <>
@@ -109,36 +64,7 @@ export default async function GroupDetails({ params }: PageProps) {
         </div>
 
         <div className="mt-4 grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-1.5">
-          {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
-            const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
-            const total = roles.length;
-            const filled = roles.filter(
-              (role) => role.userName !== null
-            ).length;
-            const isFilled = filled === total;
-
-            return (
-              <div
-                key={index}
-                className="flex items-center gap-2 rounded-lg border px-2 py-1 dark:border-input"
-              >
-                <RoleImage variant={roleName} />
-                <div className="flex flex-col">
-                  <span
-                    className={cn(
-                      'font-medium text-xs',
-                      isFilled ? 'text-primary' : 'text-muted-foreground'
-                    )}
-                  >
-                    {filled}/{total}
-                  </span>
-                  <span className="text-card-foreground text-xs capitalize">
-                    {roleName.toLowerCase()}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+          <RoleList group={group} />
         </div>
 
         <div className="mt-10 space-y-4">
@@ -154,20 +80,64 @@ export default async function GroupDetails({ params }: PageProps) {
       <Separator />
       <div className="mb-5 px-6 py-10">
         <h3 className="font-bold text-lg">Comments</h3>
-
-        <div className="mt-6 flex items-end gap-2 rounded-3xl bg-secondary p-3 transition-colors focus-within:bg-muted-foreground/15 dark:focus-within:bg-muted-foreground/25">
-          <Textarea
-            placeholder="What's on your mind?"
-            className="max-h-64 min-h-9 w-full resize-none rounded-2xl border-0 shadow-none focus-visible:ring-0 dark:bg-transparent"
-          />
-          <Button size="icon" className="rounded-full">
-            <SendIcon className="size-4" />
-          </Button>
-        </div>
+        <NewMessageForm groupId={id} userName={session?.user.userName} />
         <Suspense fallback={<CommentsSkeleton />}>
-          <Comments id={group.id} ownerName={group.ownerName} />
+          <Comments
+            groupId={group.id}
+            ownerName={group.ownerName}
+            userName={session?.user.userName}
+          />
         </Suspense>
       </div>
     </>
+  );
+}
+
+async function Comments({
+  groupId,
+  ownerName,
+  userName,
+}: { groupId: number; ownerName: string; userName: string | undefined }) {
+  const groupComments = await getGroupCommennts(groupId);
+
+  return (
+    <div className="mt-6 space-y-4">
+      {groupComments.map((comment, index) => (
+        <Card key={index} className="bg-background">
+          <CardHeader
+            className={`flex flex-col justify-between md:flex-row md:items-center md:gap-4 ${comment.userName === userName && 'flex-row-reverse'}`}
+          >
+            <div className="flex items-center gap-2 pl-1">
+              <Button
+                variant="link"
+                size="sm"
+                className="p-0 font-bold text-base text-foreground"
+              >
+                {comment.userName}
+              </Button>
+              {comment.userName === ownerName && (
+                <Crown className="size-5" color="#ffaa00" />
+              )}
+            </div>
+            <p className="text-muted-foreground text-sm">
+              {comment.createdAt.toLocaleString()}
+            </p>
+          </CardHeader>
+          <CardContent>
+            <p className="text-base text-foreground">{comment.message}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function CommentsSkeleton() {
+  return (
+    <div className="mt-6 space-y-4">
+      <Skeleton className="h-30 w-full rounded-lg" />
+      <Skeleton className="h-30 w-full rounded-lg" />
+      <Skeleton className="h-30 w-full rounded-lg" />
+    </div>
   );
 }
