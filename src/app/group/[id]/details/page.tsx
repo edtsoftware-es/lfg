@@ -99,15 +99,14 @@ async function Comments({
   userName,
 }: { groupId: number; ownerName: string; userName: string | undefined }) {
   const groupComments = await getGroupCommennts(groupId);
-
   return (
     <div className="mt-6 space-y-4">
       {groupComments.map((comment, index) => (
         <Card key={index} className="bg-background">
           <CardHeader
-            className={`flex flex-col justify-between md:flex-row md:items-center md:gap-4 ${comment.userName === userName && 'flex-row-reverse'}`}
+            className={`flex flex-col justify-between md:flex-row md:items-center md:gap-4 ${comment.userName === userName && 'bg-red'}`}
           >
-            <div className="flex items-center gap-2 pl-1">
+            <div className="flex items-center gap-2">
               <Button
                 variant="link"
                 size="sm"
