@@ -84,7 +84,7 @@ export function RequestCard({
         </CardContent>
 
         <CardFooter className="pt-0 pb-5">
-          <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-2 sm:grid-rows-1">
+          <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-1 gap-y-2 sm:grid-rows-1 sm:gap-x-4">
             <div className="col-start-1 row-start-1 flex w-fit items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
               <RoleImage variant={'FRONTEND'} />
               <span className="text-card-foreground text-sm capitalize">
@@ -100,9 +100,11 @@ export function RequestCard({
               See more <ChevronRight className="size-4" />
             </Button>
 
-            <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
-              <RequestActionButtons />
-            </div>
+            {true && (
+              <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
+                <RequestActionButtons />
+              </div>
+            )}
           </div>
         </CardFooter>
       </Card>
