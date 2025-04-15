@@ -1,3 +1,6 @@
+import { Separator } from '@/components/ui/separator';
+import { getGroupApplies } from '@/lib/queries';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
 import { RoleImage } from '@/components/role-image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -7,13 +10,12 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { ROLES } from '@/constants';
-import { type GroupApplies, getGroupApplies } from '@/lib/queries';
+import type { GroupApplies } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { Check, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
+import { RequestActionButtons } from '@/components/request-action-buttons';
 
 export default async function GroupRequests({ params }: PageProps) {
   const { id } = await params;
@@ -33,7 +35,7 @@ export default async function GroupRequests({ params }: PageProps) {
     <>
       {applies.map((apply, index) => (
         <div key={index}>
-          <ApplyItem {...apply} />
+          <RequestCard {...apply} />
           <Separator />
         </div>
       ))}
@@ -41,7 +43,7 @@ export default async function GroupRequests({ params }: PageProps) {
   );
 }
 
-function ApplyItem({
+export function RequestCard({
   createdAt,
   message,
   role,
@@ -50,70 +52,62 @@ function ApplyItem({
   const roleName = ROLES[Number(role) as keyof typeof ROLES];
 
   return (
-    <Card
-      className={cn(
-        'w-full overflow-hidden transition-all duration-200',
-        'gap-5 rounded-none border-0 bg-background p-0'
-      )}
-    >
-      <CardHeader className="flex flex-col justify-between gap-2 pt-5 md:flex-row md:items-center md:gap-4">
-        <Link
-          href={`/users/${userName}`}
-          prefetch
-          className="flex items-center gap-2.5"
-        >
+    <Link href={`/user/${userName}`} prefetch>
+      <Card
+        className={cn(
+          'relative w-full cursor-pointer overflow-hidden transition-all duration-200',
+          'gap-5 rounded-none border-0 bg-background p-0',
+          'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
+        )}
+      >
+        <CardHeader className="flex items-center gap-2.5 pt-5">
           <Avatar className="size-12">
-            <AvatarImage
-              src={'https://github.com/shadcn.png'}
-              alt={'userName'}
-            />
-            <AvatarFallback>US</AvatarFallback>
+            <AvatarImage src={'https://github.com/shadcn.png'} alt={userName} />
+            <AvatarFallback>{userName?.slice(0, 2)}</AvatarFallback>
           </Avatar>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-start">
             <Button
               variant="link"
               size="sm"
               className="p-0 text-card-foreground text-lg"
-              type="button"
             >
               {userName}
             </Button>
+            <p className="text-muted-foreground text-sm sm:absolute sm:top-3 sm:right-6">
+              {createdAt}
+            </p>
           </div>
-        </Link>
-        <p className="text-muted-foreground text-sm">{createdAt}</p>
-      </CardHeader>
-      <CardContent className="ml-1">
-        <p className="text-base text-foreground">{message}</p>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between gap-2 pb-5">
-        <div className="flex w-full flex-col items-start justify-between gap-2 sm:flex-row">
-          <div className="flex w-fit items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
-            <RoleImage variant={'FRONTEND'} />
-            <span className="text-card-foreground text-sm capitalize">
-              {roleName}
-            </span>
-          </div>
+        </CardHeader>
 
-          {true && (
-            <div className="flex w-full items-center justify-end gap-2 sm:w-fit">
-              <Button
-                variant="outline"
-                className="z-20 h-12.5 w-full shrink gap-1 rounded-lg bg-transparent shadow-none hover:border-primary active:border-primary sm:w-28 dark:bg-transparent dark:hover:border-primary"
-              >
-                <Check className="size-4 text-primary" />
-                Accept
-              </Button>
-              <Button
-                variant="outline"
-                className="h-12.5 w-full shrink gap-1 rounded-lg bg-transparent shadow-none hover:border-destructive active:border-destructive sm:w-28 dark:bg-transparent dark:hover:border-destructive"
-              >
-                <X className="size-4 text-destructive" />
-                Reject
-              </Button>
+        <CardContent className="ml-1">
+          <p className="text-base text-foreground">{message}</p>
+        </CardContent>
+
+        <CardFooter className="pt-0 pb-5">
+          <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-1 gap-y-2 sm:grid-rows-1 sm:gap-x-4">
+            <div className="col-start-1 row-start-1 flex w-fit items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
+              <RoleImage variant={'FRONTEND'} />
+              <span className="text-card-foreground text-sm capitalize">
+                {roleName.toLowerCase()}
+              </span>
             </div>
-          )}
-        </div>
-      </CardFooter>
-    </Card>
+
+            <Button
+              variant="link"
+              size="sm"
+              className="col-start-3 row-start-1 h-full gap-2 justify-self-end px-0 text-card-foreground text-sm has-[>svg]:px-0"
+            >
+              See more <ChevronRight className="size-4" />
+            </Button>
+
+            {true && (
+              <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
+                <RequestActionButtons />
+              </div>
+            )}
+          </div>
+        </CardFooter>
+      </Card>
+    </Link>
   );
 }
