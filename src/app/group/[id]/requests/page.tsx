@@ -95,7 +95,7 @@ function ApplyItem({
           </div>
 
           {true && (
-            <div className="flex w-full min-w-[500px] items-center justify-end gap-2 sm:w-fit">
+            <div className="flex w-full items-center justify-end gap-2 sm:w-fit">
               <Button
                 variant="outline"
                 className="z-20 h-12.5 w-full shrink gap-1 rounded-lg bg-transparent shadow-none hover:border-primary active:border-primary sm:w-28 dark:bg-transparent dark:hover:border-primary"
