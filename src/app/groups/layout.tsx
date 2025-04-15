@@ -1,13 +1,25 @@
-import { Separator } from '@/components/ui/separator';
 import { Tabs } from '@/components/layout/tabs';
+import { Separator } from '@/components/ui/separator';
+import { getUserGroupsWithRoles } from '@/lib/queries';
+import { getSession } from '@/lib/session';
 import type { ReactNode } from 'react';
 
-export default function GroupsLayout({ children }: { children: ReactNode }) {
-  const tabs = [
-    { name: 'In progress', path: '/groups/in-progress' },
-    { name: 'Requests', path: '/groups/requests' },
-    { name: 'Archived', path: '/groups/archived' },
-  ];
+const tabs = [
+  { name: 'In progress', path: '/groups/in-progress' },
+  { name: 'Requests', path: '/groups/requests' },
+  { name: 'Archived', path: '/groups/archived' },
+];
+
+export default async function GroupsLayout({
+  children,
+}: { children: ReactNode }) {
+  const session = await getSession();
+
+  if (!session) {
+    return null;
+  }
+
+  const userGroups = await getUserGroupsWithRoles(session.user.userName);
 
   return (
     <div className="flex h-full">

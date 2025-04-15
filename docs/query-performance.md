@@ -65,6 +65,42 @@ Obviamos el LEFT JOIN ya que no necesitamos y no deberían existir grupos sin ro
 
 Utilizamos LATERAL para una mejor agrupación de los datos
 
+## Obtener todos los grupos del usuario
+
+```sql
+SELECT
+  g.id,
+  g.owner_name as "ownerName",
+  g.name,
+  g.target,
+  g.schedule,
+  g.language,
+  g.status,
+  g.created_at as "createdAt",
+  COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+FROM
+  groups g
+JOIN LATERAL (
+  SELECT json_agg(
+    json_build_object(
+      'userName', gr.user_name,
+      'role', gr.role
+    )
+    ORDER BY gr.role ASC
+  ) AS roles
+  FROM group_roles gr
+  WHERE gr.group_id = g.id
+  LIMIT 8
+) roles_json ON true
+WHERE EXISTS (
+  SELECT 1
+  FROM group_roles gr
+  WHERE gr.group_id = g.id
+  AND gr.user_name = 'Arti'
+);
+```
+
+
 ## Obtener los datos del grupo
 
 No podemos reutilizar los datos de la llamada de getGroups, ya que estará cacheada, y puede que los datos de detalles del grupo no estén actualizados (miembros, estado, etc)

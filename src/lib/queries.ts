@@ -172,6 +172,47 @@ export type GroupById = GroupWithRoles & {
   requirements: string;
 };
 
+export const getUserGroupsWithRoles = unstable_cache(
+  async (userName: string) => {
+    const query = await db.execute(sql`
+        SELECT
+          g.id,
+          g.owner_name as "ownerName",
+          g.name,
+          g.target,
+          g.schedule,
+          g.language,
+          g.status,
+          g.created_at as "createdAt",
+          COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+        FROM
+          groups g
+        JOIN LATERAL (
+          SELECT json_agg(
+            json_build_object(
+              'userName', gr.user_name,
+              'role', gr.role
+            )
+            ORDER BY gr.role ASC
+          ) AS roles
+          FROM group_roles gr
+          WHERE gr.group_id = g.id
+          LIMIT 8
+        ) roles_json ON true
+        WHERE EXISTS (
+          SELECT 1
+          FROM group_roles gr
+          WHERE gr.group_id = g.id
+          AND gr.user_name = ${userName}
+        );
+      `);
+
+    return query.rows as GroupWithRoles[];
+  },
+  ['usergroups'],
+  { revalidate: 60 * 60 * 2 }
+);
+
 export const getGroupById = unstable_cache(
   async (groupId: number) => {
     const result = await db.execute(sql`
