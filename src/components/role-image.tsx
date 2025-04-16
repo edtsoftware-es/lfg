@@ -43,10 +43,7 @@ export function RoleImage({
       priority={true}
       width={30}
       height={30}
-      className={cn(
-        'h-auto w-auto rounded-full bg-primary bg-transparent p-1',
-        className
-      )}
+      className={cn('h-auto w-auto rounded-full bg-transparent p-1', className)}
       {...props}
     />
   );
