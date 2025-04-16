@@ -45,21 +45,21 @@ export default async function GroupDetails({ params }: PageProps) {
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground capitalize dark:border-input"
           >
             <Globe className="h-3 w-3 text-card-foreground" />
-            {group.language}
+            <span className="capitalize">{group.language.toLowerCase()}</span>
           </Badge>
           <Badge
             variant="outline"
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Clock className="h-3 w-3 text-card-foreground" />
-            {group.schedule}
+            <span className="capitalize">{group.schedule.toLowerCase()}</span>
           </Badge>
           <Badge
             variant="outline"
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Target className="h-3 w-3 text-card-foreground" />
-            {group.target}
+            <span className="capitalize">{group.target.toLowerCase()}</span>
           </Badge>
         </div>
 

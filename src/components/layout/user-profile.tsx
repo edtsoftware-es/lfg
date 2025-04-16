@@ -1,3 +1,4 @@
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,9 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { getUser, getUserProfile } from '@/lib/queries';
 import { signOut } from '@/lib/actions/auth';
+import { getUser, getUserProfile } from '@/lib/queries';
 import { LogOut, Settings } from 'lucide-react';
 
 export async function UserProfile() {
@@ -24,7 +24,7 @@ export async function UserProfile() {
           className="my-3 flex size-14 items-center justify-center gap-0 rounded-full p-0 has-[>svg]:px-0 lg:h-fit lg:w-full lg:justify-between lg:gap-2 lg:px-2 lg:py-2 lg:has-[>svg]:px-2"
         >
           <div className="flex items-center gap-2">
-            <Avatar className="size-14">
+            <Avatar className="size-10">
               <AvatarImage
                 src={userProfile?.icon || 'https://github.com/shadcn.png'}
                 alt={userProfile?.name || 'User'}

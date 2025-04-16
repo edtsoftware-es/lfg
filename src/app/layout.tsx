@@ -42,7 +42,7 @@ async function MainLayout({ children }: { children: ReactNode }) {
               asChild
             >
               <Link href="/">
-                <div className="flex items-center gap-2 pl-2">
+                <div className="flex items-center gap-2 pl-0 lg:pl-2">
                   <Users className="size-7 text-primary" />
                   <h1 className="hidden font-black text-xl lg:block">LFG</h1>
                 </div>
@@ -73,7 +73,7 @@ async function MainLayout({ children }: { children: ReactNode }) {
             </nav>
 
             <Button
-              className="mt-3 size-14 items-center justify-center gap-0 rounded-full p-0 text-md has-[>svg]:px-0 lg:h-12 lg:w-full lg:gap-2 lg:px-4 lg:py-3 lg:has-[>svg]:px-4"
+              className="mt-3 size-10 items-center justify-center gap-0 rounded-full p-0 text-md has-[>svg]:px-0 lg:h-12 lg:w-full lg:gap-2 lg:px-4 lg:py-3 lg:has-[>svg]:px-4"
               asChild
             >
               <Link href="/create-group">

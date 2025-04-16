@@ -15,7 +15,7 @@ import {
   users,
 } from '@/db/schema';
 
-import { type SQL, eq, sql } from 'drizzle-orm';
+import { type SQL, desc, eq, sql } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { verifyToken } from './session';
 
@@ -319,7 +319,8 @@ export const getGroupCommennts = unstable_cache(
         createdAt: groupComments.createdAt,
       })
       .from(groupComments)
-      .where(eq(groupComments.groupId, groupId));
+      .where(eq(groupComments.groupId, groupId))
+      .orderBy((comments) => [desc(comments.createdAt)]);
   },
   ['comments'],
   {
