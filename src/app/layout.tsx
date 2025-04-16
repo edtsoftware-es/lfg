@@ -3,16 +3,16 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Suspense } from 'react';
 import type { ReactNode } from 'react';
 import './globals.css';
+import { LoginModalWrapper } from '@/components/auth/login-modal-wrapper';
+import { NavItem } from '@/components/layout/nav-item';
+import { UserProfile } from '@/components/layout/user-profile';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Button } from '@/components/ui/button';
-import { Toaster } from '@/components/ui/sonner';
-import { Home, MessageSquare, Plus, Search, User, Users } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
-import { NavItem } from '@/components/layout/nav-item';
+import { Toaster } from '@/components/ui/sonner';
 import { getSession } from '@/lib/session';
-import { LoginModalWrapper } from '@/components/auth/login-modal-wrapper';
-import { UserProfile } from '@/components/layout/user-profile';
+import { Home, MessageSquare, Plus, Search, User, Users } from 'lucide-react';
+import Link from 'next/link';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,14 +35,14 @@ async function MainLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen justify-center bg-background">
       <header className="sticky top-0 left-0 flex h-screen w-20 lg:w-64">
         <div className="flex h-full flex-1 flex-col items-center justify-between overflow-y-auto px-1 py-1 lg:px-3">
-          <div className="flex w-full flex-col items-center lg:items-start">
+          <div className="flex w-full flex-col items-center px-2 lg:items-start">
             <Button
               variant="ghost"
               className="mb-3 flex size-16 items-center justify-center rounded-full p-0 hover:bg-transparent lg:w-full lg:justify-between lg:px-3 dark:hover:bg-transparent"
               asChild
             >
               <Link href="/">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 pl-2">
                   <Users className="size-7 text-primary" />
                   <h1 className="hidden font-black text-xl lg:block">LFG</h1>
                 </div>

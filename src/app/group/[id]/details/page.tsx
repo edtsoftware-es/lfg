@@ -19,7 +19,7 @@ export default async function GroupDetails({ params }: PageProps) {
   return (
     <>
       <div className="px-6 py-10">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-1">
             <h2 className="bg-clip-text font-bold text-2xl text-foreground">
               {group.name}
