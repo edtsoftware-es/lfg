@@ -1,6 +1,6 @@
-import { unstable_cache } from './unstable-cache';
+import { unstable_cache } from "./unstable-cache";
 
-import { db } from '@/db/drizzle';
+import { db } from "@/db/drizzle";
 import {
   type GroupRole,
   type GroupStatusType,
@@ -13,14 +13,14 @@ import {
   roles,
   userProfile,
   users,
-} from '@/db/schema';
+} from "@/db/schema";
 
-import { type SQL, desc, eq, sql } from 'drizzle-orm';
-import { cookies } from 'next/headers';
-import { verifyToken } from './session';
+import { type SQL, desc, eq, sql } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { verifyToken } from "./session";
 
 export async function getUser() {
-  const session = (await cookies()).get('session');
+  const session = (await cookies()).get("session");
   if (!session || !session.value) {
     return null;
   }
@@ -51,7 +51,7 @@ export const getUserProfile = unstable_cache(
     }
 
     let query: SQL<unknown>;
-    if (typeof userIdentifier === 'number') {
+    if (typeof userIdentifier === "number") {
       query = eq(userProfile.userId, userIdentifier);
     } else {
       query = eq(userProfile.userName, userIdentifier);
@@ -84,9 +84,10 @@ export const getUserProfile = unstable_cache(
 
     return profile[0];
   },
-  ['profile'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["profile"],
   }
 );
 
@@ -102,9 +103,10 @@ export const getRoles = unstable_cache(
       })
       .from(roles);
   },
-  ['roles'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["roles"],
   }
 );
 
@@ -114,9 +116,10 @@ export const getGroups = unstable_cache(
   () => {
     return db.select().from(groups);
   },
-  ['groups'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
@@ -131,7 +134,7 @@ export type GroupWithRoles = {
   language: LanguageType;
   status: GroupStatusType;
   createdAt: Date;
-  groupRoles: Pick<GroupRole, 'role' | 'userName'>[];
+  groupRoles: Pick<GroupRole, "role" | "userName">[];
 };
 
 export const getGroupsWithRoles = unstable_cache(
@@ -165,8 +168,11 @@ export const getGroupsWithRoles = unstable_cache(
 
     return query.rows as GroupWithRoles[];
   },
-  ['groups'],
-  { revalidate: 60 * 60 * 2 }
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ["groups"],
+  }
 );
 
 export type GroupById = GroupWithRoles & {
@@ -211,8 +217,8 @@ export const getUserGroupsWithRoles = unstable_cache(
 
     return query.rows as GroupWithRoles[];
   },
-  ['usergroups'],
-  { revalidate: 60 * 60 * 2 }
+  [],
+  { revalidate: 60 * 60 * 2, tags: ["groups"] }
 );
 
 export const getGroupById = unstable_cache(
@@ -251,8 +257,8 @@ export const getGroupById = unstable_cache(
 
     return result.rows[0] as GroupById;
   },
-  ['group'],
-  { revalidate: 60 * 60 * 2 }
+  [],
+  { revalidate: 60 * 60 * 2, tags: ["groups"] }
 );
 
 export const getGroupMembers = unstable_cache(
@@ -264,9 +270,10 @@ export const getGroupMembers = unstable_cache(
       .from(groupRoles)
       .where(eq(groupRoles.groupId, groupId));
   },
-  ['members'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
@@ -304,9 +311,10 @@ export const getGroupMembersInfo = unstable_cache(
       `);
     return query.rows as GroupMemberInfo[];
   },
-  ['membersInfo'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
@@ -322,9 +330,10 @@ export const getGroupCommennts = unstable_cache(
       .where(eq(groupComments.groupId, groupId))
       .orderBy((comments) => [desc(comments.createdAt)]);
   },
-  ['comments'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
@@ -356,10 +365,15 @@ export const getGroupApplies = unstable_cache(
       `);
     return query.rows as GroupApplies[];
   },
-  ['applies'],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
-export type GroupComments = Awaited<ReturnType<typeof getGroupCommennts>>;
+export type GroupComments = Array<{
+  userName: string | null;
+  message: string;
+  createdAt: Date;
+}>;
