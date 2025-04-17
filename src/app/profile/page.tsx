@@ -1,0 +1,168 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { getUserProfile, type UserProfile } from '@/lib/queries';
+import { getSession } from '@/lib/session';
+import { Github, Instagram, Linkedin, Twitter } from 'lucide-react';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+// const USER_MOCK = {
+//   icon: 'https://github.com/shadcn.png',
+//   name: 'John Doe',
+//   userName: 'john_doe',
+//   linkedin: 'https://www.linkedin.com/in/john-doe',
+//   twitter: 'https://x.com/john_doe',
+//   instagram: 'https://www.instagram.com/john_doe',
+//   github: 'https://github.com/john_doe',
+//   role: 'FRONTEND',
+//   bio: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum, voluptatum? Omnis libero doloremque placeat accusamus, iusto iure est aspernatur explicabo eius ducimus doloribus accusantium cupiditate minus ratione dolorum, hic dolore.',
+//   skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript'],
+//   email: 'john.doe@example.com',
+//   location: 'New York, NY',
+// };
+
+export default async function Profile() {
+  const session = await getSession();
+  if (!session) {
+    redirect('/');
+  }
+  const user = await getUserProfile(session.user.id);
+
+  return (
+    <div className="flex h-full">
+      <div className="flex flex-1 flex-col">
+        <div className="sticky top-0 z-10 flex flex-col">
+          <div className="bg-background/95 pt-1 backdrop-blur-sm">
+            <div className="flex h-16 items-center px-4 ">
+              <h2 className="font-bold text-xl">Profile</h2>
+            </div>
+          </div>
+          <Separator />
+        </div>
+        <ProfileContent user={user} />
+      </div>
+      <Separator orientation="vertical" />
+      <div className="hidden h-full w-64 md:block" />
+    </div>
+  );
+}
+
+function ProfileContent({ user }: { user: UserProfile }) {
+  return (
+    <div className="px-6 py-10">
+      <div className="flex flex-col items-center gap-3 md:flex-row">
+        <Avatar className="size-16">
+          <AvatarImage
+            src={user?.icon || 'https://github.com/shadcn.png'}
+            alt={user?.name || 'User'}
+          />
+          <AvatarFallback className="text-3xl">
+            {user?.name?.charAt(0) || 'U'}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="space-y-0.5">
+          <h2 className="font-bold text-xl">{user?.name ?? 'User'}</h2>
+          <p className="text-lg text-muted-foreground">
+            {`@${user?.userName ?? 'username'}`}
+          </p>
+        </div>
+
+        <div className="ml-auto flex space-x-1 self-start">
+          {user?.linkedin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-fit rounded-full p-3 text-muted-foreground"
+              asChild
+            >
+              <Link href={user?.linkedin ?? 'https://www.linkedin.com'}>
+                <Linkedin className="size-6" />
+              </Link>
+            </Button>
+          )}
+          {user?.twitter && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-fit rounded-full p-3 text-muted-foreground"
+              asChild
+            >
+              <Link href={user?.twitter ?? 'https://x.com'}>
+                <Twitter className="size-6" />
+              </Link>
+            </Button>
+          )}
+          {user?.instagram && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-fit rounded-full p-3 text-muted-foreground"
+              asChild
+            >
+              <Link href={user?.instagram ?? 'https://www.instagram.com'}>
+                <Instagram className="size-6" />
+              </Link>
+            </Button>
+          )}
+          {user?.github && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-fit rounded-full p-3 text-muted-foreground"
+              asChild
+            >
+              <Link href={user?.github ?? 'https://github.com'}>
+                <Github className="size-6" />
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {user?.bio && <p className="mt-5 text-foreground">{user.bio}</p>}
+
+      {user?.createdAt && (
+        <p className="mt-3 text-foreground">
+          Joined {user.createdAt.toString()}
+        </p>
+      )}
+
+      {user?.aboutMe && (
+        <div className="mt-10 space-y-4">
+          <h3 className="font-bold text-lg">About me</h3>
+          <p className="text-foreground">{user.aboutMe}</p>
+        </div>
+      )}
+
+      {user?.skills && user?.skills?.length > 0 && (
+        <div className="mt-10 space-y-4">
+          <h3 className="font-bold text-lg">Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {user?.skills?.map((item, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
+              >
+                {item}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {(user?.email || user?.location) && (
+        <div className="mt-10 space-y-4">
+          <h3 className="font-bold text-lg">Contact</h3>
+          <div className="space-y-2">
+            <p className="text-foreground">{user?.email}</p>
+            <p className="text-foreground">{user?.location}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

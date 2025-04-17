@@ -2,19 +2,20 @@ import { unstable_cache } from "./unstable-cache";
 
 import { db } from "@/db/drizzle";
 import {
+  type GroupRole,
+  type GroupStatusType,
+  type LanguageType,
+  type ScheduleType,
+  type TargetType,
   groupComments,
+  groupRoles,
   groups,
   roles,
   userProfile,
   users,
-  type GroupStateType,
-  type LanguageType,
-  type ScheduleType,
-  type TargetType,
-  type GroupRole,
 } from "@/db/schema";
 
-import { type SQL, eq, sql } from "drizzle-orm";
+import { type SQL, desc, eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { verifyToken } from "./session";
 
@@ -70,6 +71,8 @@ export const getUserProfile = unstable_cache(
         twitter: userProfile.twitter,
         instagram: userProfile.instagram,
         github: userProfile.github,
+        aboutMe: userProfile.aboutMe,
+        createdAt: userProfile.createdAt,
       })
       .from(userProfile)
       .where(query)
@@ -81,9 +84,10 @@ export const getUserProfile = unstable_cache(
 
     return profile[0];
   },
-  ["profile"],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["profile"],
   }
 );
 
@@ -99,9 +103,10 @@ export const getRoles = unstable_cache(
       })
       .from(roles);
   },
-  ["roles"],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["roles"],
   }
 );
 
@@ -111,9 +116,10 @@ export const getGroups = unstable_cache(
   () => {
     return db.select().from(groups);
   },
-  ["groups"],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
@@ -121,13 +127,13 @@ export type Group = Awaited<ReturnType<typeof getGroups>>;
 
 export type GroupWithRoles = {
   id: number;
-  owner_name: string;
+  ownerName: string;
   name: string;
   target: TargetType;
   schedule: ScheduleType;
   language: LanguageType;
-  state: GroupStateType;
-  created_at: Date;
+  status: GroupStatusType;
+  createdAt: Date;
   groupRoles: Pick<GroupRole, "role" | "userName">[];
 };
 
@@ -136,13 +142,13 @@ export const getGroupsWithRoles = unstable_cache(
     const query = await db.execute(sql`
     SELECT
       g.id,
-      g.owner_name,
+      g.owner_name as "ownerName",
       g.name,
       g.target,
       g.schedule,
       g.language,
-      g.state,
-      g.created_at,
+      g.status,
+      g.created_at as "createdAt",
       COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
     FROM
       groups g
@@ -162,36 +168,78 @@ export const getGroupsWithRoles = unstable_cache(
 
     return query.rows as GroupWithRoles[];
   },
-  ["groups"],
-  { revalidate: 60 * 60 * 2 }
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ["groups"],
+  }
 );
 
-export type GroupById = Omit<GroupWithRoles, "created_at" | "groupRoles"> & {
+export type GroupById = GroupWithRoles & {
   description: string;
   requirements: string;
-  createdAt: Date;
-  groupRoles: (Pick<GroupRole, "role"> & { user_name: string })[];
 };
+
+export const getUserGroupsWithRoles = unstable_cache(
+  async (userName: string) => {
+    const query = await db.execute(sql`
+        SELECT
+          g.id,
+          g.owner_name as "ownerName",
+          g.name,
+          g.target,
+          g.schedule,
+          g.language,
+          g.status,
+          g.created_at as "createdAt",
+          COALESCE(roles_json.roles, '[]'::json) AS "groupRoles"
+        FROM
+          groups g
+        JOIN LATERAL (
+          SELECT json_agg(
+            json_build_object(
+              'userName', gr.user_name,
+              'role', gr.role
+            )
+            ORDER BY gr.role ASC
+          ) AS roles
+          FROM group_roles gr
+          WHERE gr.group_id = g.id
+          LIMIT 8
+        ) roles_json ON true
+        WHERE EXISTS (
+          SELECT 1
+          FROM group_roles gr
+          WHERE gr.group_id = g.id
+          AND gr.user_name = ${userName}
+        );
+      `);
+
+    return query.rows as GroupWithRoles[];
+  },
+  [],
+  { revalidate: 60 * 60 * 2, tags: ["groups"] }
+);
 
 export const getGroupById = unstable_cache(
   async (groupId: number) => {
     const result = await db.execute(sql`
     SELECT
       g.id,
-      g.owner_name,
+      g.owner_name AS "ownerName",
       g.name,
       g.description,
       g.requirements,
       g.target,
       g.schedule,
       g.language,
-      g.state,
+      g.status,
       g.created_at AS "createdAt",
       COALESCE(
         (
           SELECT json_agg(
             json_build_object(
-              'user_name', gr.user_name,
+              'userName', gr.user_name,
               'role', gr.role
             )
             ORDER BY gr.role ASC
@@ -209,8 +257,65 @@ export const getGroupById = unstable_cache(
 
     return result.rows[0] as GroupById;
   },
-  ["group"],
-  { revalidate: 60 * 60 * 2 }
+  [],
+  { revalidate: 60 * 60 * 2, tags: ["groups"] }
+);
+
+export const getGroupMembers = unstable_cache(
+  async (groupId: number) => {
+    return await db
+      .select({
+        userName: groupRoles.userName,
+      })
+      .from(groupRoles)
+      .where(eq(groupRoles.groupId, groupId));
+  },
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ["groups"],
+  }
+);
+
+export type GroupMemberInfo = {
+  userId: number;
+  userName: string;
+  name: string | null;
+  icon: string;
+  bio: string;
+  role: number;
+};
+
+export const getGroupMembersInfo = unstable_cache(
+  async (groupId: number, members: string[]) => {
+    const membersPlaceholders = sql.join(
+      members.map((member) => sql`${member}`),
+      sql`, `
+    );
+
+    const query = await db.execute(sql`
+        SELECT
+            u.user_id AS "userId",
+            u.user_name AS "userName",
+            u.name,
+            u.icon,
+            u.bio,
+            g.role
+        FROM
+            user_profile u
+        JOIN
+            group_roles g ON u.user_name = g.user_name
+        WHERE
+            g.group_id = ${groupId}
+        AND u.user_name IN (${membersPlaceholders});
+      `);
+    return query.rows as GroupMemberInfo[];
+  },
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ["groups"],
+  }
 );
 
 export const getGroupCommennts = unstable_cache(
@@ -222,12 +327,53 @@ export const getGroupCommennts = unstable_cache(
         createdAt: groupComments.createdAt,
       })
       .from(groupComments)
-      .where(eq(groupComments.groupId, groupId));
+      .where(eq(groupComments.groupId, groupId))
+      .orderBy((comments) => [desc(comments.createdAt)]);
   },
-  ["comments"],
+  [],
   {
     revalidate: 60 * 60 * 2,
+    tags: ["groups"],
   }
 );
 
-export type GroupComments = Awaited<ReturnType<typeof getGroupCommennts>>;
+export type GroupApplies = {
+  userName: string;
+  role: number;
+  message: string;
+  status: string;
+  createdAt: string;
+  icon: string;
+};
+
+export const getGroupApplies = unstable_cache(
+  async (groupId: number) => {
+    const query = await db.execute(sql`
+        SELECT
+            a.user_name AS "userName",
+            a.role,
+            a.message,
+            a.status,
+            a.created_at AS "createdAt",
+            u.icon
+        FROM
+            applies a
+        JOIN
+            user_profile u ON u.user_name = a.user_name
+        WHERE
+            group_id = ${groupId}
+      `);
+    return query.rows as GroupApplies[];
+  },
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ["groups"],
+  }
+);
+
+export type GroupComments = Array<{
+  userName: string | null;
+  message: string;
+  createdAt: Date;
+}>;

@@ -6,23 +6,20 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import type { GroupWithRoles } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 import { ChevronRight, Clock, Crown, Globe, Target } from 'lucide-react';
 import Link from 'next/link';
 import { GroupStatusAbsolute } from './group-status';
-import { RoleImage } from './role-image';
-import { ROLES } from '@/constants';
-import type { GroupWithRoles } from '@/lib/queries';
+import { RoleList } from './role-list';
 
 export function GroupCard({
   group,
 }: {
   group: GroupWithRoles;
 }) {
-  const groupedRoles = Object.groupBy(group.groupRoles, ({ role }) => role);
-
   return (
-    <Link href={`/groups/${group.id}/details`} prefetch>
+    <Link href={`/group/${group.id}/details`} prefetch>
       <Card
         className={cn(
           'group relative w-full cursor-pointer overflow-hidden transition-all duration-200',
@@ -30,7 +27,7 @@ export function GroupCard({
           'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
         )}
       >
-        <GroupStatusAbsolute status={group.state} />
+        <GroupStatusAbsolute status={group.status} />
 
         <CardHeader className="gap-3 pt-5">
           <h3 className="pl-2 font-bold text-card-foreground text-lg">
@@ -43,57 +40,28 @@ export function GroupCard({
               className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
             >
               <Globe className="h-3 w-3 text-card-foreground" />
-              {group.language}
+              <span className="capitalize">{group.language.toLowerCase()}</span>
             </Badge>
             <Badge
               variant="outline"
               className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
             >
               <Clock className="h-3 w-3 text-card-foreground" />
-              {group.schedule}
+              <span className="capitalize">{group.schedule.toLowerCase()}</span>
             </Badge>
             <Badge
               variant="outline"
               className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
             >
               <Target className="h-3 w-3 text-card-foreground" />
-              {group.target}
+              <span className="capitalize">{group.target.toLowerCase()}</span>
             </Badge>
           </div>
         </CardHeader>
 
         <CardContent>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-1.5">
-            {Object.entries(groupedRoles).map(([roleId, roles = []], index) => {
-              const roleName = ROLES[Number(roleId) as keyof typeof ROLES];
-              const total = roles.length;
-              const filled = roles.filter(
-                (role) => role.userName !== null
-              ).length;
-              const isFilled = filled === total;
-
-              return (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 rounded-lg border px-2 py-1 dark:border-input"
-                >
-                  <RoleImage variant={roleName} />
-                  <div className="flex flex-col">
-                    <span
-                      className={cn(
-                        'font-medium text-xs',
-                        isFilled ? 'text-primary' : 'text-muted-foreground'
-                      )}
-                    >
-                      {filled}/{total}
-                    </span>
-                    <span className="text-card-foreground text-xs capitalize">
-                      {roleName.toLowerCase()}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            <RoleList group={group} />
           </div>
         </CardContent>
 
@@ -106,7 +74,7 @@ export function GroupCard({
                 size="sm"
                 className="p-0 font-semibold text-card-foreground text-sm"
               >
-                {group.owner_name}
+                {group.ownerName}
               </Button>
             </div>
           </div>
