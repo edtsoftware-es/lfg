@@ -1,10 +1,11 @@
-'use server';
+"use server";
 
-import { db } from '@/db/drizzle';
-import { groupComments } from '@/db/schema';
-import { z } from 'zod';
-import { to } from '../await-to';
-import { validatedAction } from '../middleware';
+import { db } from "@/db/drizzle";
+import { groupComments } from "@/db/schema";
+import { z } from "zod";
+import { to } from "../await-to";
+import { validatedAction } from "../middleware";
+import { revalidateTag } from "next/cache";
 
 export type NewMessageFormState = {
   error?: boolean;
@@ -29,10 +30,13 @@ export const sendCommentAction = validatedAction(
         .values({ message: message, userName: userName, groupId: +groupId })
         .returning()
     );
+
     if (error) {
       return {
-        error: 'An error occurred while submitting the comment.',
+        error: "An error occurred while submitting the comment.",
       };
     }
+
+    revalidateTag("groups");
   }
 );

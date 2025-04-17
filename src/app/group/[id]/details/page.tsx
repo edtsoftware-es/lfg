@@ -1,16 +1,16 @@
-import { GroupStatus } from '@/components/group-status';
-import { RoleList } from '@/components/role-list';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { getGroupById, getGroupCommennts } from '@/lib/queries';
-import { getSession } from '@/lib/session';
-import { Clock, Crown, Globe, Target } from 'lucide-react';
-import { Suspense } from 'react';
-import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
-import { NewMessageForm } from './ui/new-message-form';
+import { GroupStatus } from "@/components/group-status";
+import { RoleList } from "@/components/role-list";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getGroupById, getGroupCommennts } from "@/lib/queries";
+import { getSession } from "@/lib/session";
+import { Clock, Crown, Globe, Target } from "lucide-react";
+import { Suspense } from "react";
+import type { PageProps } from "../../../../../.next/types/app/group/[id]/details/page";
+import { NewMessageForm } from "./ui/new-message-form";
 
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
@@ -80,7 +80,7 @@ export default async function GroupDetails({ params }: PageProps) {
       <Separator />
       <div className="mb-5 px-6 py-10">
         <h3 className="font-bold text-lg">Comments</h3>
-        <NewMessageForm groupId={id} userName={session?.user.userName} />
+
         <Suspense fallback={<CommentsSkeleton />}>
           <Comments
             groupId={group.id}
@@ -97,37 +97,19 @@ async function Comments({
   groupId,
   ownerName,
   userName,
-}: { groupId: number; ownerName: string; userName: string | undefined }) {
+}: {
+  groupId: number;
+  ownerName: string;
+  userName: string | undefined;
+}) {
   const groupComments = await getGroupCommennts(groupId);
   return (
-    <div className="mt-6 space-y-4">
-      {groupComments.map((comment, index) => (
-        <Card key={index} className="bg-background">
-          <CardHeader
-            className={`flex flex-col justify-between md:flex-row md:items-center md:gap-4 ${comment.userName === userName && 'bg-red'}`}
-          >
-            <div className="flex items-center gap-2">
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 font-bold text-base text-foreground"
-              >
-                {comment.userName}
-              </Button>
-              {comment.userName === ownerName && (
-                <Crown className="size-5" color="#ffaa00" />
-              )}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              {comment.createdAt.toLocaleString()}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <p className="text-base text-foreground">{comment.message}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <NewMessageForm
+      groupId={groupId}
+      userName={userName}
+      initialComments={groupComments}
+      ownerName={ownerName}
+    />
   );
 }
 
