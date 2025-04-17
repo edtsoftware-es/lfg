@@ -332,6 +332,10 @@ export const getGroupCommennts = unstable_cache(
   }
 );
 
+export const preloadGroupComments = (groupId: number) => {
+  void getGroupCommennts(groupId);
+};
+
 export type GroupApplies = {
   userName: string;
   role: number;
