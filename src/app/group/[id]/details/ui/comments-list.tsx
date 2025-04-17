@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Crown } from "lucide-react";
 import { GroupComments } from "@/lib/queries";
-
+import { format } from "date-fns";
 interface CommentsListProps {
   comments: GroupComments;
   ownerName: string;
@@ -38,7 +38,7 @@ export function CommentsList({
               )}
             </div>
             <p className="text-muted-foreground text-sm">
-              {comment.createdAt.toLocaleString()}
+              {format(comment.createdAt, "dd/MM/yyyy, HH:mm:ss")}
             </p>
           </CardHeader>
           <CardContent>

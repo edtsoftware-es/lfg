@@ -6,20 +6,21 @@ import { sendCommentAction } from "@/lib/actions/send-comment";
 import type { ActionState } from "@/lib/middleware";
 import { GroupComments } from "@/lib/queries";
 import { SendIcon } from "lucide-react";
-import { useActionState, useOptimistic, useRef } from "react";
+import { use, useActionState, useOptimistic, useRef } from "react";
 import { CommentsList } from "./comments-list";
 
 export function NewMessageForm({
   groupId,
   userName,
-  initialComments,
+  groupCommentsPromise,
   ownerName,
 }: {
   groupId: number;
   userName?: string;
-  initialComments: GroupComments;
+  groupCommentsPromise: Promise<GroupComments>;
   ownerName: string;
 }) {
+  const initialComments = use(groupCommentsPromise);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [optimisticComments, setOptimisticComments] = useOptimistic(
     initialComments,
@@ -48,6 +49,7 @@ export function NewMessageForm({
           setOptimisticComments(newComment);
           if (textareaRef.current) {
             textareaRef.current.value = "";
+            textareaRef.current.focus();
           }
           newCommentFormAction(formData);
         }}

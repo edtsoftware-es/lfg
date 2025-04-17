@@ -2,7 +2,6 @@ import { GroupStatus } from "@/components/group-status";
 import { RoleList } from "@/components/role-list";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGroupById, getGroupCommennts } from "@/lib/queries";
@@ -15,6 +14,7 @@ import { NewMessageForm } from "./ui/new-message-form";
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
   const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
+  const groupCommentsPromise = getGroupCommennts(+id);
 
   return (
     <>
@@ -82,34 +82,15 @@ export default async function GroupDetails({ params }: PageProps) {
         <h3 className="font-bold text-lg">Comments</h3>
 
         <Suspense fallback={<CommentsSkeleton />}>
-          <Comments
+          <NewMessageForm
             groupId={group.id}
             ownerName={group.ownerName}
             userName={session?.user.userName}
+            groupCommentsPromise={groupCommentsPromise}
           />
         </Suspense>
       </div>
     </>
-  );
-}
-
-async function Comments({
-  groupId,
-  ownerName,
-  userName,
-}: {
-  groupId: number;
-  ownerName: string;
-  userName: string | undefined;
-}) {
-  const groupComments = await getGroupCommennts(groupId);
-  return (
-    <NewMessageForm
-      groupId={groupId}
-      userName={userName}
-      initialComments={groupComments}
-      ownerName={ownerName}
-    />
   );
 }
 
