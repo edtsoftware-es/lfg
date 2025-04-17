@@ -4,7 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getGroupById, getGroupCommennts } from "@/lib/queries";
+import {
+  getGroupById,
+  getGroupCommennts,
+  preloadGroupComments,
+} from "@/lib/queries";
 import { getSession } from "@/lib/session";
 import { Clock, Crown, Globe, Target } from "lucide-react";
 import { Suspense } from "react";
@@ -13,6 +17,9 @@ import { NewMessageForm } from "./ui/new-message-form";
 
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
+
+  preloadGroupComments(+id);
+
   const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
   const groupCommentsPromise = getGroupCommennts(+id);
 
