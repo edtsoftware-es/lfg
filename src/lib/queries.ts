@@ -287,12 +287,7 @@ export type GroupMemberInfo = {
 };
 
 export const getGroupMembersInfo = unstable_cache(
-  async (groupId: number, members: string[]) => {
-    const membersPlaceholders = sql.join(
-      members.map((member) => sql`${member}`),
-      sql`, `
-    );
-
+  async (groupId: number) => {
     const query = await db.execute(sql`
         SELECT
             u.user_id AS "userId",
@@ -307,7 +302,7 @@ export const getGroupMembersInfo = unstable_cache(
             group_roles g ON u.user_name = g.user_name
         WHERE
             g.group_id = ${groupId}
-        AND u.user_name IN (${membersPlaceholders});
+        AND u.user_name IS NOT NULL;
       `);
     return query.rows as GroupMemberInfo[];
   },
