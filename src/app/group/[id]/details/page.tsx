@@ -1,25 +1,32 @@
-import { GroupStatus } from '@/components/group-status';
-import { RoleList } from '@/components/role-list';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
-import { getGroupById, getGroupCommennts } from '@/lib/queries';
-import { getSession } from '@/lib/session';
-import { Clock, Crown, Globe, Target } from 'lucide-react';
-import { Suspense } from 'react';
-import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
-import { NewMessageForm } from './ui/new-message-form';
+import { GroupStatus } from "@/components/group-status";
+import { RoleList } from "@/components/role-list";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  getGroupById,
+  getGroupCommennts,
+  preloadGroupComments,
+} from "@/lib/queries";
+import { getSession } from "@/lib/session";
+import { Clock, Crown, Globe, Target } from "lucide-react";
+import { Suspense } from "react";
+import type { PageProps } from "../../../../../.next/types/app/group/[id]/details/page";
+import { NewMessageForm } from "./ui/new-message-form";
 
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
+
+  preloadGroupComments(+id);
+
   const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
+  const groupCommentsPromise = getGroupCommennts(+id);
 
   return (
     <>
       <div className="px-6 py-10">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-1">
             <h2 className="bg-clip-text font-bold text-2xl text-foreground">
               {group.name}
@@ -45,21 +52,21 @@ export default async function GroupDetails({ params }: PageProps) {
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground capitalize dark:border-input"
           >
             <Globe className="h-3 w-3 text-card-foreground" />
-            {group.language}
+            <span className="capitalize">{group.language.toLowerCase()}</span>
           </Badge>
           <Badge
             variant="outline"
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Clock className="h-3 w-3 text-card-foreground" />
-            {group.schedule}
+            <span className="capitalize">{group.schedule.toLowerCase()}</span>
           </Badge>
           <Badge
             variant="outline"
             className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
           >
             <Target className="h-3 w-3 text-card-foreground" />
-            {group.target}
+            <span className="capitalize">{group.target.toLowerCase()}</span>
           </Badge>
         </div>
 
@@ -80,54 +87,17 @@ export default async function GroupDetails({ params }: PageProps) {
       <Separator />
       <div className="mb-5 px-6 py-10">
         <h3 className="font-bold text-lg">Comments</h3>
-        <NewMessageForm groupId={id} userName={session?.user.userName} />
+
         <Suspense fallback={<CommentsSkeleton />}>
-          <Comments
+          <NewMessageForm
             groupId={group.id}
             ownerName={group.ownerName}
             userName={session?.user.userName}
+            groupCommentsPromise={groupCommentsPromise}
           />
         </Suspense>
       </div>
     </>
-  );
-}
-
-async function Comments({
-  groupId,
-  ownerName,
-  userName,
-}: { groupId: number; ownerName: string; userName: string | undefined }) {
-  const groupComments = await getGroupCommennts(groupId);
-  return (
-    <div className="mt-6 space-y-4">
-      {groupComments.map((comment, index) => (
-        <Card key={index} className="bg-background">
-          <CardHeader
-            className={`flex flex-col justify-between md:flex-row md:items-center md:gap-4 ${comment.userName === userName && 'bg-red'}`}
-          >
-            <div className="flex items-center gap-2">
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 font-bold text-base text-foreground"
-              >
-                {comment.userName}
-              </Button>
-              {comment.userName === ownerName && (
-                <Crown className="size-5" color="#ffaa00" />
-              )}
-            </div>
-            <p className="text-muted-foreground text-sm">
-              {comment.createdAt.toLocaleString()}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <p className="text-base text-foreground">{comment.message}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
   );
 }
 
