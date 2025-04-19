@@ -11,21 +11,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { format } from 'date-fns';
 
-// const USER_MOCK = {
-//   icon: 'https://github.com/shadcn.png',
-//   name: 'John Doe',
-//   userName: 'john_doe',
-//   linkedin: 'https://www.linkedin.com/in/john-doe',
-//   twitter: 'https://x.com/john_doe',
-//   instagram: 'https://www.instagram.com/john_doe',
-//   github: 'https://github.com/john_doe',
-//   role: 'FRONTEND',
-//   bio: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum, voluptatum? Omnis libero doloremque placeat accusamus, iusto iure est aspernatur explicabo eius ducimus doloribus accusantium cupiditate minus ratione dolorum, hic dolore.',
-//   skills: ['React', 'Next.js', 'Tailwind CSS', 'TypeScript'],
-//   email: 'john.doe@example.com',
-//   location: 'New York, NY',
-// };
-
 export default async function Profile() {
   const session = await getSession();
   if (!session) {
@@ -129,14 +114,14 @@ function ProfileContent({ user }: { user: UserProfile }) {
         </div>
       </div>
 
-      <div className="mt-1 flex flex-col-reverse justify-between gap-5 lg:flex-row lg:items-end lg:gap-2">
+      <div className="mt-5 flex flex-col-reverse justify-between gap-5 lg:mt-1 lg:flex-row lg:items-end lg:gap-2">
         {user?.createdAt && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="size-4 shrink-0" />
             <p>Joined {format(user.createdAt, 'dd MMMM yyyy')}</p>
           </div>
         )}
-        <div className="flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
+        <div className="mx-auto flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1 lg:mr-0 dark:border-input">
           <RoleImage variant={roleName} />
           <span className="text-foreground text-sm capitalize">
             {roleName.toLowerCase()}
