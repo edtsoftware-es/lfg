@@ -1,17 +1,11 @@
-"use server";
+'use server';
 
-import { db } from "@/db/drizzle";
-import { groupComments } from "@/db/schema";
-import { z } from "zod";
-import { to } from "../await-to";
-import { validatedAction } from "../middleware";
-import { revalidateTag } from "next/cache";
-
-export type NewMessageFormState = {
-  error?: boolean;
-  message: string;
-  payload?: FormData;
-};
+import { db } from '@/db/drizzle';
+import { groupComments } from '@/db/schema';
+import { revalidateTag } from 'next/cache';
+import { z } from 'zod';
+import { to } from '../await-to';
+import { validatedAction } from '../middleware';
 
 const newCommentSchema = z.object({
   userName: z.string().min(3),
@@ -33,10 +27,10 @@ export const sendCommentAction = validatedAction(
 
     if (error) {
       return {
-        error: "An error occurred while submitting the comment.",
+        error: 'An error occurred while submitting the comment.',
       };
     }
 
-    revalidateTag("groups");
+    revalidateTag('groups');
   }
 );
