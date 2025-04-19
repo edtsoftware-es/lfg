@@ -1,10 +1,12 @@
+import { RoleImage } from '@/components/role-image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { ROLES } from '@/constants';
 import { getUserProfile, type UserProfile } from '@/lib/queries';
 import { getSession } from '@/lib/session';
-import { Github, Instagram, Linkedin, Twitter } from 'lucide-react';
+import { Calendar, Github, Instagram, Linkedin, Twitter } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -50,9 +52,11 @@ export default async function Profile() {
 }
 
 function ProfileContent({ user }: { user: UserProfile }) {
+  const roleName = ROLES[Number(user?.role) as keyof typeof ROLES];
+
   return (
     <div className="px-6 py-10">
-      <div className="flex flex-col items-center gap-3 md:flex-row">
+      <div className="flex flex-col items-center gap-3 lg:flex-row">
         <Avatar className="size-16">
           <AvatarImage
             src={user?.icon || 'https://github.com/shadcn.png'}
@@ -64,13 +68,15 @@ function ProfileContent({ user }: { user: UserProfile }) {
         </Avatar>
 
         <div className="space-y-0.5">
-          <h2 className="font-bold text-xl">{user?.name ?? 'User'}</h2>
-          <p className="text-lg text-muted-foreground">
+          <h2 className="text-center font-bold text-xl lg:text-start">
+            {user?.name ?? 'User'}
+          </h2>
+          <p className="text-center text-lg text-muted-foreground lg:text-start">
             {`@${user?.userName ?? 'username'}`}
           </p>
         </div>
 
-        <div className="ml-auto flex space-x-1 self-start">
+        <div className="flex space-x-1 lg:ml-auto lg:self-start">
           {user?.linkedin && (
             <Button
               variant="ghost"
@@ -122,32 +128,41 @@ function ProfileContent({ user }: { user: UserProfile }) {
         </div>
       </div>
 
-      {user?.bio && <p className="mt-5 text-foreground">{user.bio}</p>}
+      <div className="mt-1 flex flex-col-reverse justify-between gap-5 lg:flex-row lg:items-end lg:gap-2">
+        {user?.createdAt && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Calendar className="size-4 shrink-0" />
+            <p>Joined {user.createdAt.toString()}</p>
+          </div>
+        )}
+        <div className="flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
+          <RoleImage variant={'FRONTEND'} />
+          <span className="text-card-foreground text-sm capitalize">
+            {roleName.toLowerCase()}
+          </span>
+        </div>
+      </div>
 
-      {user?.createdAt && (
-        <p className="mt-3 text-foreground">
-          Joined {user.createdAt.toString()}
-        </p>
-      )}
+      {user?.bio && <p className="mt-5">{user.bio}</p>}
 
       {user?.aboutMe && (
         <div className="mt-10 space-y-4">
           <h3 className="font-bold text-lg">About me</h3>
-          <p className="text-foreground">{user.aboutMe}</p>
+          <p>{user.aboutMe}</p>
         </div>
       )}
 
       {user?.skills && user?.skills?.length > 0 && (
         <div className="mt-10 space-y-4">
           <h3 className="font-bold text-lg">Skills</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {user?.skills?.map((item, index) => (
               <Badge
                 key={index}
                 variant="outline"
                 className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
               >
-                {item}
+                {item.toUpperCase()}
               </Badge>
             ))}
           </div>
@@ -158,8 +173,8 @@ function ProfileContent({ user }: { user: UserProfile }) {
         <div className="mt-10 space-y-4">
           <h3 className="font-bold text-lg">Contact</h3>
           <div className="space-y-2">
-            <p className="text-foreground">{user?.email}</p>
-            <p className="text-foreground">{user?.location}</p>
+            <p>{user?.email}</p>
+            <p>{user?.location}</p>
           </div>
         </div>
       )}
