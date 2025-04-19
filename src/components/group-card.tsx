@@ -78,13 +78,12 @@ export function GroupCard({
               </Button>
             </div>
           </div>
-          <Button
-            variant="link"
-            size="sm"
+          <button
+            type="button"
             className="gap-2 px-0 text-card-foreground text-sm has-[>svg]:px-0"
           >
             See more <ChevronRight className="size-4" />
-          </Button>
+          </button>
         </CardFooter>
       </Card>
     </Link>
