@@ -9,6 +9,7 @@ import { getSession } from '@/lib/session';
 import { Calendar, Github, Instagram, Linkedin, Twitter } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { format } from 'date-fns';
 
 // const USER_MOCK = {
 //   icon: 'https://github.com/shadcn.png',
@@ -132,7 +133,7 @@ function ProfileContent({ user }: { user: UserProfile }) {
         {user?.createdAt && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="size-4 shrink-0" />
-            <p>Joined {user.createdAt.toString()}</p>
+            <p>Joined {format(user.createdAt, 'dd MMMM yyyy')}</p>
           </div>
         )}
         <div className="flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
