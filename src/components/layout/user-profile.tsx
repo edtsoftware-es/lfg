@@ -34,7 +34,7 @@ export async function UserProfile() {
               </AvatarFallback>
             </Avatar>
             <div className="hidden lg:block">
-              <p className="font-semibold text-base">
+              <p className="text-start font-semibold text-base">
                 {userProfile?.name || 'User'}
               </p>
               <p className="text-start text-muted-foreground text-sm">
