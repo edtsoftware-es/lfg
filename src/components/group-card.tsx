@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -80,7 +82,7 @@ export function GroupCard({
           </div>
           <button
             type="button"
-            className="gap-2 px-0 text-card-foreground text-sm has-[>svg]:px-0"
+            className="gap-2 px-0 text-[18px] text-card-foreground has-[>svg]:px-0"
           >
             See more <ChevronRight className="size-4" />
           </button>
