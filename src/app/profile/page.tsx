@@ -137,8 +137,8 @@ function ProfileContent({ user }: { user: UserProfile }) {
           </div>
         )}
         <div className="flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
-          <RoleImage variant={'FRONTEND'} />
-          <span className="text-card-foreground text-sm capitalize">
+          <RoleImage variant={roleName} />
+          <span className="text-foreground text-sm capitalize">
             {roleName.toLowerCase()}
           </span>
         </div>
@@ -161,7 +161,7 @@ function ProfileContent({ user }: { user: UserProfile }) {
               <Badge
                 key={index}
                 variant="outline"
-                className="flex items-center gap-1 border px-2.5 py-1 text-card-foreground dark:border-input"
+                className="flex items-center gap-1 border px-2.5 py-1 text-foreground dark:border-input"
               >
                 {item.toUpperCase()}
               </Badge>
