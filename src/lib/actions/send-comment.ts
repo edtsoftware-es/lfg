@@ -1,11 +1,9 @@
-"use server";
+'use server';
 
-import { db } from "@/db/drizzle";
-import { groupComments } from "@/db/schema";
-import { z } from "zod";
-import { to } from "../await-to";
-import { validatedAction } from "../middleware";
-import { revalidateTag } from "next/cache";
+import { db } from '@/db/drizzle';
+import { groupComments } from '@/db/schema';
+import { revalidateTag } from 'next/cache';
+import { to } from '../await-to';
 
 export type NewMessageFormState = {
   error?: boolean;
@@ -13,30 +11,29 @@ export type NewMessageFormState = {
   payload?: FormData;
 };
 
-const newCommentSchema = z.object({
-  userName: z.string().min(3),
-  groupId: z.string().min(1),
-  message: z.string().min(1),
-});
+export const sendCommentAction = async (data: FormData) => {
+  const userName = data.get('userName') as string;
+  const groupId = data.get('groupId') as string;
+  const message = data.get('message') as string;
 
-export const sendCommentAction = validatedAction(
-  newCommentSchema,
-  async (data) => {
-    const { message, groupId, userName } = data;
-
-    const [error, _result] = await to(
-      db
-        .insert(groupComments)
-        .values({ message: message, userName: userName, groupId: +groupId })
-        .returning()
-    );
-
-    if (error) {
-      return {
-        error: "An error occurred while submitting the comment.",
-      };
-    }
-
-    revalidateTag("groups");
+  if (!userName || !groupId || !message) {
+    return {
+      error: 'Debes completar todos los campos',
+    };
   }
-);
+
+  const [error, _result] = await to(
+    db
+      .insert(groupComments)
+      .values({ message: message, userName: userName, groupId: +groupId })
+      .returning()
+  );
+
+  if (error) {
+    return {
+      error: 'An error occurred while submitting the comment.',
+    };
+  }
+
+  revalidateTag('groups');
+};
