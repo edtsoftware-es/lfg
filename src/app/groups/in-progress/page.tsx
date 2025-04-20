@@ -1,13 +1,20 @@
 import { GroupCard } from '@/components/group-card';
 import { Separator } from '@/components/ui/separator';
-import { getGroupsWithRoles } from '@/lib/queries';
+import { getUserGroupsWithRoles } from '@/lib/queries';
+import { getSession } from '@/lib/session';
+import { redirect } from 'next/navigation';
 
 const GROUPS_IN_PROGRESS = ['OPEN', 'ONGOING', 'REBUILD'];
 
 export default async function GroupsInProgress() {
-  const groups = await getGroupsWithRoles();
+  const session = await getSession();
 
-  const groupsInProgress = groups.filter((group) =>
+  if (!session) {
+    redirect('/');
+  }
+  const userGroups = await getUserGroupsWithRoles(session.user.userName);
+
+  const groupsInProgress = userGroups.filter((group) =>
     GROUPS_IN_PROGRESS.includes(group.status)
   );
 

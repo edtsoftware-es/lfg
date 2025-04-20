@@ -1,6 +1,6 @@
-import { unstable_cache } from "./unstable-cache";
+import { unstable_cache } from './unstable-cache';
 
-import { db } from "@/db/drizzle";
+import { db } from '@/db/drizzle';
 import {
   type GroupRole,
   type GroupStatusType,
@@ -13,14 +13,14 @@ import {
   roles,
   userProfile,
   users,
-} from "@/db/schema";
+} from '@/db/schema';
 
-import { type SQL, desc, eq, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { verifyToken } from "./session";
+import { type SQL, desc, eq, sql } from 'drizzle-orm';
+import { cookies } from 'next/headers';
+import { verifyToken } from './session';
 
 export async function getUser() {
-  const session = (await cookies()).get("session");
+  const session = (await cookies()).get('session');
   if (!session || !session.value) {
     return null;
   }
@@ -51,7 +51,7 @@ export const getUserProfile = unstable_cache(
     }
 
     let query: SQL<unknown>;
-    if (typeof userIdentifier === "number") {
+    if (typeof userIdentifier === 'number') {
       query = eq(userProfile.userId, userIdentifier);
     } else {
       query = eq(userProfile.userName, userIdentifier);
@@ -87,7 +87,7 @@ export const getUserProfile = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["profile"],
+    tags: ['profile'],
   }
 );
 
@@ -106,7 +106,7 @@ export const getRoles = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["roles"],
+    tags: ['roles'],
   }
 );
 
@@ -119,7 +119,7 @@ export const getGroups = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -134,7 +134,7 @@ export type GroupWithRoles = {
   language: LanguageType;
   status: GroupStatusType;
   createdAt: Date;
-  groupRoles: Pick<GroupRole, "role" | "userName">[];
+  groupRoles: Pick<GroupRole, 'role' | 'userName'>[];
 };
 
 export const getGroupsWithRoles = unstable_cache(
@@ -171,7 +171,7 @@ export const getGroupsWithRoles = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -218,7 +218,7 @@ export const getUserGroupsWithRoles = unstable_cache(
     return query.rows as GroupWithRoles[];
   },
   [],
-  { revalidate: 60 * 60 * 2, tags: ["groups"] }
+  { revalidate: 60 * 60 * 2, tags: ['groups'] }
 );
 
 export const getGroupById = unstable_cache(
@@ -258,7 +258,7 @@ export const getGroupById = unstable_cache(
     return result.rows[0] as GroupById;
   },
   [],
-  { revalidate: 60 * 60 * 2, tags: ["groups"] }
+  { revalidate: 60 * 60 * 2, tags: ['groups'] }
 );
 
 export const getGroupMembers = unstable_cache(
@@ -273,7 +273,7 @@ export const getGroupMembers = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -309,7 +309,7 @@ export const getGroupMembersInfo = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -328,7 +328,7 @@ export const getGroupCommennts = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -367,7 +367,7 @@ export const getGroupApplies = unstable_cache(
   [],
   {
     revalidate: 60 * 60 * 2,
-    tags: ["groups"],
+    tags: ['groups'],
   }
 );
 
@@ -376,3 +376,38 @@ export type GroupComments = Array<{
   message: string;
   createdAt: Date;
 }>;
+
+export const getUserApplies = unstable_cache(
+  async (userId: number) => {
+    const query = await db.execute(
+      sql`
+        SELECT
+            a.id,
+            g.name,
+            a.role,
+            a.message,
+            a.created_at AS "createdAt"
+        FROM
+            applies a
+        JOIN
+            groups g ON a.group_id = g.id
+        WHERE
+            a.user_id = ${userId} AND a.status = 'PENDING';
+    `
+    );
+    return query.rows as UserApplies[];
+  },
+  [],
+  {
+    revalidate: 60 * 60 * 2,
+    tags: ['userApplies'],
+  }
+);
+
+export type UserApplies = {
+  id: number;
+  name: string;
+  role: number;
+  message: string;
+  createdAt: string;
+};

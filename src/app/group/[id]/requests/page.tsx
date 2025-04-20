@@ -86,7 +86,7 @@ export function RequestCard({
         <CardFooter className="pt-0 pb-5">
           <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-1 gap-y-2 sm:grid-rows-1 sm:gap-x-4">
             <div className="col-start-1 row-start-1 flex w-fit items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
-              <RoleImage variant={'FRONTEND'} />
+              <RoleImage variant={roleName} />
               <span className="text-card-foreground text-sm capitalize">
                 {roleName.toLowerCase()}
               </span>
