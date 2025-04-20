@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { sendCommentAction } from "@/lib/actions/send-comment";
-import type { ActionState } from "@/lib/middleware";
-import { GroupComments } from "@/lib/queries";
-import { SendIcon } from "lucide-react";
-import { use, useActionState, useOptimistic, useRef } from "react";
-import { CommentsList } from "./comments-list";
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { sendCommentAction } from '@/lib/actions/send-comment';
+import type { ActionState } from '@/lib/middleware';
+import type { GroupComments } from '@/lib/queries';
+import { SendIcon } from 'lucide-react';
+import { use, useActionState, useOptimistic, useRef } from 'react';
+import { CommentsList } from './comments-list';
 
 export function NewMessageForm({
   groupId,
@@ -31,7 +31,7 @@ export function NewMessageForm({
   );
 
   const [newCommentState, newCommentFormAction, _newCommentIsPending] =
-    useActionState<ActionState, FormData>(sendCommentAction, { error: "" });
+    useActionState<ActionState, FormData>(sendCommentAction, { error: '' });
 
   if (!userName) {
     return null;
@@ -43,12 +43,12 @@ export function NewMessageForm({
         action={(formData) => {
           const newComment = {
             userName,
-            message: formData.get("message") as string,
+            message: formData.get('message') as string,
             createdAt: new Date(),
           };
           setOptimisticComments(newComment);
           if (textareaRef.current) {
-            textareaRef.current.value = "";
+            textareaRef.current.value = '';
             textareaRef.current.focus();
           }
           newCommentFormAction(formData);
