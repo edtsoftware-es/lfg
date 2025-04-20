@@ -1,13 +1,20 @@
 import { GroupCard } from '@/components/group-card';
 import { Separator } from '@/components/ui/separator';
-import { getGroupsWithRoles } from '@/lib/queries';
+import { getUserGroupsWithRoles } from '@/lib/queries';
+import { getSession } from '@/lib/session';
+import { redirect } from 'next/navigation';
 
 const GROUPS_ARCHIVED = ['CLOSED', 'DONE'];
 
 export default async function GroupsArchived() {
-  const groups = await getGroupsWithRoles();
+  const session = await getSession();
 
-  const groupsArchived = groups.filter((group) =>
+  if (!session) {
+    redirect('/');
+  }
+  const userGroups = await getUserGroupsWithRoles(session.user.userName);
+
+  const groupsArchived = userGroups.filter((group) =>
     GROUPS_ARCHIVED.includes(group.status)
   );
 

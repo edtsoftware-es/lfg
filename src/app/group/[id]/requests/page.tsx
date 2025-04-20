@@ -51,20 +51,19 @@ export function RequestCard({
   const roleName = ROLES[Number(role) as keyof typeof ROLES];
 
   return (
-    <Link href={`/user/${userName}`} prefetch>
-      <Card
-        className={cn(
-          'relative w-full cursor-pointer overflow-hidden transition-all duration-200',
-          'gap-5 rounded-none border-0 bg-background p-0',
-          'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
-        )}
-      >
+    <Card
+      className={cn(
+        'relative w-full overflow-hidden',
+        'gap-5 rounded-none border-0 bg-background p-0'
+      )}
+    >
+      <Link href={`/user/${userName}`} prefetch>
         <CardHeader className="flex items-center gap-2.5 pt-5">
           <Avatar className="size-12">
             <AvatarImage src={'https://github.com/shadcn.png'} alt={userName} />
             <AvatarFallback>{userName?.slice(0, 2)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col items-start">
+          <div className="flex w-full items-center justify-between">
             <Button
               variant="link"
               size="sm"
@@ -72,32 +71,32 @@ export function RequestCard({
             >
               {userName}
             </Button>
-            <p className="text-muted-foreground text-sm sm:absolute sm:top-3 sm:right-6">
+            <p className="text-muted-foreground text-sm sm:right-6">
               {createdAt}
             </p>
           </div>
         </CardHeader>
-
-        <CardContent className="ml-1">
+        <CardContent className="ml-1 pt-2">
           <p className="text-base text-foreground">{message}</p>
         </CardContent>
+      </Link>
 
-        <CardFooter className="pt-0 pb-5">
-          <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-1 gap-y-2 sm:grid-rows-1 sm:gap-x-4">
-            <div className="col-start-1 row-start-1 flex w-fit items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
-              <RoleImage variant={roleName} />
-              <span className="text-card-foreground text-sm capitalize">
-                {roleName.toLowerCase()}
-              </span>
-            </div>
-            {true && (
-              <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
-                <RequestActionButtons />
-              </div>
-            )}
+      <CardFooter className="pt-0 pb-5">
+        <div className="grid w-full grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-y-2 sm:grid-rows-1">
+          <div className="col-start-1 row-start-1 flex w-fit items-center gap-2 rounded-lg">
+            <span>To: </span>
+            <RoleImage variant={roleName} />
+            <span className="text-card-foreground text-sm capitalize">
+              {roleName.toLowerCase()}
+            </span>
           </div>
-        </CardFooter>
-      </Card>
-    </Link>
+          {true && (
+            <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
+              <RequestActionButtons />
+            </div>
+          )}
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

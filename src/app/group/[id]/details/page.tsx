@@ -1,27 +1,33 @@
-import { GroupStatus } from "@/components/group-status";
-import { RoleList } from "@/components/role-list";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { GroupStatus } from '@/components/group-status';
+import { RoleList } from '@/components/role-list';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   getGroupById,
   getGroupCommennts,
   preloadGroupComments,
-} from "@/lib/queries";
-import { getSession } from "@/lib/session";
-import { Clock, Crown, Globe, Target } from "lucide-react";
-import { Suspense } from "react";
-import type { PageProps } from "../../../../../.next/types/app/group/[id]/details/page";
-import { NewMessageForm } from "./ui/new-message-form";
+} from '@/lib/queries';
+import { getSession } from '@/lib/session';
+import { isUserInGroupRoles } from '@/lib/utils';
+import { Clock, Crown, Globe, Target } from 'lucide-react';
+import { Suspense } from 'react';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
+import { NewMessageForm } from './ui/new-message-form';
 
 export default async function GroupDetails({ params }: PageProps) {
   const { id } = await params;
+  let isMember = false;
 
   preloadGroupComments(+id);
 
   const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
   const groupCommentsPromise = getGroupCommennts(+id);
+
+  if (session) {
+    isMember = isUserInGroupRoles(session.user.userName, group.groupRoles);
+  }
 
   return (
     <>
@@ -84,19 +90,27 @@ export default async function GroupDetails({ params }: PageProps) {
           <p>{group.requirements}</p>
         </div>
       </div>
-      <Separator />
-      <div className="mb-5 px-6 py-10">
-        <h3 className="font-bold text-lg">Comments</h3>
+      {session && isMember ? (
+        <>
+          <Separator />
+          <div className="mb-5 px-6 py-10">
+            <h3 className="font-bold text-lg">Comments</h3>
 
-        <Suspense fallback={<CommentsSkeleton />}>
-          <NewMessageForm
-            groupId={group.id}
-            ownerName={group.ownerName}
-            userName={session?.user.userName}
-            groupCommentsPromise={groupCommentsPromise}
-          />
-        </Suspense>
-      </div>
+            <Suspense fallback={<CommentsSkeleton />}>
+              <NewMessageForm
+                groupId={group.id}
+                ownerName={group.ownerName}
+                userName={session?.user.userName}
+                groupCommentsPromise={groupCommentsPromise}
+              />
+            </Suspense>
+          </div>
+        </>
+      ) : (
+        <section className="flex w-full justify-center">
+          <Button className="h-12.5 w-full max-w-[50%] font-bold">Únete</Button>
+        </section>
+      )}
     </>
   );
 }

@@ -383,6 +383,7 @@ export const getUserApplies = unstable_cache(
       sql`
         SELECT
             a.id,
+            a.group_id AS "groupId",
             g.name,
             a.role,
             a.message,
@@ -406,6 +407,7 @@ export const getUserApplies = unstable_cache(
 
 export type UserApplies = {
   id: number;
+  groupId: number;
   name: string;
   role: number;
   message: string;
