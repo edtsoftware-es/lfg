@@ -1,23 +1,19 @@
-import { RoleImage } from "@/components/role-image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { RoleImage } from '@/components/role-image';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { ROLES } from "@/constants";
-import {
-  type GroupMemberInfo,
-  getGroupMembers,
-  getGroupMembersInfo,
-} from "@/lib/queries";
-import { cn } from "@/lib/utils";
-import { Eye } from "lucide-react";
-import Link from "next/link";
-import type { PageProps } from "../../../../../.next/types/app/group/[id]/members/page";
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { ROLES } from '@/constants';
+import { type GroupMemberInfo, getGroupMembersInfo } from '@/lib/queries';
+import { cn } from '@/lib/utils';
+import { Eye } from 'lucide-react';
+import Link from 'next/link';
+import type { PageProps } from '../../../../../.next/types/app/group/[id]/members/page';
 
 export default async function GroupMembers({ params }: PageProps) {
   const { id } = await params;
@@ -43,16 +39,16 @@ function MemberCard({ bio, role, userName }: Partial<GroupMemberInfo>) {
       <Link href={`/user/${userName}`} prefetch>
         <Card
           className={cn(
-            "w-full cursor-pointer overflow-hidden transition-all duration-200",
-            "gap-5 rounded-none border-0 bg-background p-0",
-            "hover:bg-muted-foreground/5 dark:hover:bg-foreground/5"
+            'w-full cursor-pointer overflow-hidden transition-all duration-200',
+            'gap-5 rounded-none border-0 bg-background p-0',
+            'hover:bg-muted-foreground/5 dark:hover:bg-foreground/5'
           )}
         >
           <CardHeader className="flex flex-col justify-between pt-5 md:flex-row md:items-center md:gap-4">
             <div className="flex items-center gap-2.5">
               <Avatar className="size-12">
                 <AvatarImage
-                  src={"https://github.com/shadcn.png"}
+                  src={'https://github.com/shadcn.png'}
                   alt={userName}
                 />
                 <AvatarFallback>{userName?.slice(0, 2)}</AvatarFallback>
@@ -73,7 +69,7 @@ function MemberCard({ bio, role, userName }: Partial<GroupMemberInfo>) {
           </CardContent>
           <CardFooter className="flex items-center justify-between gap-2 pb-5">
             <div className="flex items-center gap-2 rounded-lg border px-3 py-1 dark:border-input">
-              <RoleImage variant={"FRONTEND"} />
+              <RoleImage variant={'FRONTEND'} />
               <span className="text-card-foreground text-sm capitalize">
                 {roleName.toLowerCase()}
               </span>

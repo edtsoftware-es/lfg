@@ -58,28 +58,34 @@ async function MainLayout({ children }: { children: ReactNode }) {
                 <MessageSquare className="size-7" />
                 <span className="hidden lg:block">Webo</span>
               </NavItem>
-              <NavItem href="/groups/in-progress">
-                <Users className="size-7" />
-                <span className="hidden lg:block">Groups</span>
-              </NavItem>
+              {session && (
+                <NavItem href="/groups/in-progress">
+                  <Users className="size-7" />
+                  <span className="hidden lg:block">Groups</span>
+                </NavItem>
+              )}
               <NavItem href="/search">
                 <Search className="size-7" />
                 <span className="hidden lg:block">Search</span>
               </NavItem>
-              <NavItem href="/profile">
-                <User className="size-7" />
-                <span className="hidden lg:block">Profile</span>
-              </NavItem>
+              {session && (
+                <NavItem href="/profile">
+                  <User className="size-7" />
+                  <span className="hidden lg:block">Profile</span>
+                </NavItem>
+              )}
             </nav>
 
             <Button
               className="mt-3 size-10 items-center justify-center gap-0 rounded-full p-0 text-md has-[>svg]:px-0 lg:h-12 lg:w-full lg:gap-2 lg:px-4 lg:py-3 lg:has-[>svg]:px-4"
               asChild
             >
-              <Link href="/create-group">
-                <Plus className="block size-6 lg:hidden" />
-                <span className="hidden lg:block">Create Group</span>
-              </Link>
+              {session && (
+                <Link href="/create-group">
+                  <Plus className="block size-6 lg:hidden" />
+                  <span className="hidden lg:block">Create Group</span>
+                </Link>
+              )}
             </Button>
           </div>
 

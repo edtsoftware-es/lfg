@@ -1,9 +1,17 @@
 import { Tabs } from '@/components/layout/tabs';
 import { Separator } from '@/components/ui/separator';
+import { getGroupById } from '@/lib/queries';
+import { getSession, isUserInGroupRoles } from '@/lib/session';
 import type { LayoutProps } from '../../../../.next/types/app/group/[id]/layout';
 
 export default async function GroupLayout({ children, params }: LayoutProps) {
   const { id } = await params;
+  let isMember = false;
+  const [session, group] = await Promise.all([getSession(), getGroupById(+id)]);
+
+  if (session) {
+    isMember = isUserInGroupRoles(session?.user.userName, group.groupRoles);
+  }
 
   const tabs = [
     { name: 'Details', path: `/group/${id}/details` },
@@ -11,13 +19,19 @@ export default async function GroupLayout({ children, params }: LayoutProps) {
     { name: 'Requests', path: `/group/${id}/requests` },
   ];
 
+  let showedTabs = tabs;
+
+  if (!isMember) {
+    showedTabs = tabs.filter((tab) => tab.name !== 'Requests');
+  }
+
   return (
     <div className="flex h-full">
       <div className="flex flex-1 flex-col">
         <div className="sticky top-0 z-10 flex flex-col">
           <div className="bg-background/95 pt-1 backdrop-blur-sm">
             <div className="flex flex-col">
-              <Tabs tabs={tabs} />
+              <Tabs tabs={showedTabs} />
               <Separator />
             </div>
           </div>

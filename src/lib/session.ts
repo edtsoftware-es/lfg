@@ -1,4 +1,4 @@
-import type { User } from '@/db/schema';
+import type { GroupRole, User } from '@/db/schema';
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
@@ -60,4 +60,14 @@ export async function setSession(user: User) {
     secure: true,
     sameSite: 'lax',
   });
+}
+
+export function isUserInGroupRoles(
+  userName: string,
+  groupRoles: Pick<GroupRole, 'role' | 'userName'>[]
+) {
+  if (!groupRoles || !Array.isArray(groupRoles) || !userName) {
+    return false;
+  }
+  return groupRoles.some((item) => item.userName === userName);
 }

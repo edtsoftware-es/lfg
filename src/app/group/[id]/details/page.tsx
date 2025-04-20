@@ -9,8 +9,7 @@ import {
   getGroupCommennts,
   preloadGroupComments,
 } from '@/lib/queries';
-import { getSession } from '@/lib/session';
-import { isUserInGroupRoles } from '@/lib/utils';
+import { getSession, isUserInGroupRoles } from '@/lib/session';
 import { Clock, Crown, Globe, Target } from 'lucide-react';
 import { Suspense } from 'react';
 import type { PageProps } from '../../../../../.next/types/app/group/[id]/details/page';
@@ -26,7 +25,7 @@ export default async function GroupDetails({ params }: PageProps) {
   const groupCommentsPromise = getGroupCommennts(+id);
 
   if (session) {
-    isMember = isUserInGroupRoles(session.user.userName, group.groupRoles);
+    isMember = isUserInGroupRoles(session?.user.userName, group.groupRoles);
   }
 
   return (
