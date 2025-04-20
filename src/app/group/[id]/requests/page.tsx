@@ -13,7 +13,6 @@ import { ROLES } from '@/constants';
 import { getGroupApplies } from '@/lib/queries';
 import type { GroupApplies } from '@/lib/queries';
 import { cn } from '@/lib/utils';
-import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import type { PageProps } from '../../../../../.next/types/app/group/[id]/requests/page';
 
@@ -91,15 +90,6 @@ export function RequestCard({
                 {roleName.toLowerCase()}
               </span>
             </div>
-
-            <Button
-              variant="link"
-              size="sm"
-              className="col-start-3 row-start-1 h-full gap-2 justify-self-end px-0 text-card-foreground text-sm has-[>svg]:px-0"
-            >
-              <Eye className="size-4" /> View profile
-            </Button>
-
             {true && (
               <div className="col-span-3 row-start-2 flex gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-end">
                 <RequestActionButtons />
